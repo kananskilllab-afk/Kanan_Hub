@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 import User from '../models/User.js';
 import Holiday from '../models/Holiday.js';
 import Announcement from '../models/Announcement.js';
@@ -24,12 +22,8 @@ import { computeAttendance, halfDayMinutesFor } from '../services/attendanceEngi
 const router = Router();
 router.use(requireAuth);
 
-const AVATAR_DIR = path.join(process.cwd(), 'uploads', 'avatars');
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: AVATAR_DIR,
-    filename: (req, file, cb) => cb(null, `${req.userId}-${Date.now()}${path.extname(file.originalname)}`)
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 3 * 1024 * 1024 },
   fileFilter: (req, file, cb) => cb(null, file.mimetype.startsWith('image/'))
 });
@@ -256,14 +250,9 @@ router.post('/profile/photo', upload.single('photo'), async (req, res) => {
   const me = await User.findById(req.userId);
   if (!me) return res.status(404).json({ message: 'User not found' });
 
-  const previousUrl = me.avatarUrl;
-  me.avatarUrl = `/uploads/avatars/${req.file.filename}`;
+  // Stored as a data URI (not a disk path) so it survives on serverless hosts with no persistent filesystem.
+  me.avatarUrl = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
   await me.save();
-
-  if (previousUrl) {
-    const previousPath = path.join(process.cwd(), previousUrl);
-    fs.unlink(previousPath, () => {});
-  }
 
   res.json({ avatarUrl: me.avatarUrl });
 });
