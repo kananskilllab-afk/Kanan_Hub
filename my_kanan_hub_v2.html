@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Kanan Hub — Kanan.co Digital Workplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-dark:#1A3A8F; --blue-mid:#2B52AE; --blue-light:#4A72CE; --blue-pale:#E8EEFF;
+    --green:#27944A; --green-light:#E6F7EC; --gold:#E8A020; --gold-light:#FFF6E0;
+    --red:#E03B3B; --red-light:#FDECEA; --purple:#7C5CBF; --purple-light:#F0EBFF;
+    --orange:#D4620A; --orange-light:#FFF0E6;
+    --text-dark:#0F1B3D; --text-mid:#3A4668; --text-muted:#7886A8;
+    --border:#E0E6F4; --surface:#F5F7FD; --white:#FFFFFF;
+    --sidebar-w:260px; --header-h:60px; --radius:10px;
+    --shadow-sm:0 1px 4px rgba(15,27,61,0.08); --shadow-md:0 4px 16px rgba(15,27,61,0.10);
+    --shadow-lg:0 8px 32px rgba(15,27,61,0.14); --transition:0.2s cubic-bezier(0.4,0,0.2,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text-dark);display:flex;height:100vh;overflow:hidden;font-size:13.5px}
+
+  /* ── SIDEBAR ── */
+  #sidebar{width:var(--sidebar-w);background:var(--blue-dark);height:100vh;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width var(--transition);z-index:100;position:relative}
+  #sidebar::after{content:'';position:absolute;bottom:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(78,116,220,0.3) 0%,transparent 70%);pointer-events:none}
+  #sidebar.collapsed{width:60px}
+  #sidebar.hidden-page{display:none}
+  #header.console-mode .header-toggle,#header.console-mode .header-title,#header.console-mode .search-bar,#header.console-mode .cal-btn,#header.console-mode #notifBtn,#header.console-mode .hdr-gear{display:none}
+  #sidebar.collapsed .nav-label,#sidebar.collapsed .hub-title,#sidebar.collapsed .sidebar-logo-text{display:none}
+  #sidebar.collapsed .nav-item{justify-content:center;padding:10px 0}
+  #sidebar.collapsed .nav-icon{margin:0}
+  #sidebar.collapsed .sidebar-logo{padding:0 14px}
+  #sidebar.collapsed .sidebar-logo img{width:32px}
+  .sidebar-logo{display:flex;align-items:center;gap:10px;padding:13px 16px 11px;border-bottom:1px solid rgba(255,255,255,0.10);flex-shrink:0;min-height:60px}
+  .sidebar-logo img{width:110px;height:auto;filter:brightness(0) invert(1);flex-shrink:0}
+  .sidebar-logo-text{font-size:8px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap;font-family:'Sora',sans-serif}
+  .sidebar-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0 14px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.12) transparent}
+  .sidebar-nav::-webkit-scrollbar{width:3px}
+  .sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:3px}
+  .hub-group{margin-bottom:2px}
+  .hub-group.hub-hidden{display:none}
+  .hub-title{font-family:'Sora',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:10px 16px 3px;white-space:nowrap}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;color:rgba(255,255,255,0.68);transition:all var(--transition);white-space:nowrap;border-left:3px solid transparent;position:relative}
+  .nav-item:hover{background:rgba(255,255,255,0.07);color:#fff}
+  .nav-item.active{background:rgba(255,255,255,0.12);color:#fff;border-left-color:var(--gold)}
+  .nav-item.active .nav-icon{color:var(--gold)}
+  .nav-icon{font-size:15px;width:17px;text-align:center;flex-shrink:0;color:rgba(255,255,255,0.5);transition:color var(--transition)}
+  .nav-item:hover .nav-icon{color:rgba(255,255,255,0.9)}
+  .nav-label{font-size:12.5px;font-weight:400;line-height:1.2}
+  .nav-badge{margin-left:auto;background:var(--gold);color:var(--blue-dark);font-size:10px;font-weight:700;border-radius:20px;padding:1px 6px;font-family:'Sora',sans-serif}
+  .sidebar-user{border-top:1px solid rgba(255,255,255,0.10);padding:12px 14px;display:flex;align-items:center;gap:9px;flex-shrink:0}
+  .user-avatar-sm{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#F07B30);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:white;flex-shrink:0}
+  .user-name-sm{font-size:12.5px;font-weight:600;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .user-email-sm{font-size:10.5px;color:rgba(255,255,255,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ── MAIN ── */
+  #main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  #header{height:var(--header-h);background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 20px;flex-shrink:0;box-shadow:var(--shadow-sm);z-index:50}
+  .header-toggle{width:34px;height:34px;border:none;background:var(--surface);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--text-mid);transition:background var(--transition);flex-shrink:0}
+  .header-toggle:hover{background:var(--blue-pale);color:var(--blue-mid)}
+  .header-title{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--blue-dark);white-space:nowrap;flex-shrink:0}
+  .search-bar{flex:1;max-width:400px;position:relative;margin:0 10px}
+  .search-bar input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:30px;padding:7px 14px 7px 36px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-dark);outline:none;transition:all var(--transition)}
+  .search-bar input:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(74,114,206,0.10);background:white}
+  .search-bar input::placeholder{color:var(--text-muted)}
+  .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px}
+  .header-actions{display:flex;align-items:center;gap:5px;margin-left:auto}
+  .hdr-btn{width:36px;height:36px;border-radius:9px;border:none;background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text-mid);transition:all var(--transition);position:relative}
+  .hdr-btn:hover{background:var(--blue-pale);color:var(--blue-mid)}
+  .hdr-btn .dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid white}
+  .cal-btn{display:flex;align-items:center;gap:6px;padding:6px 13px;background:var(--blue-pale);color:var(--blue-mid);border:1.5px solid rgba(74,114,206,0.22);border-radius:30px;font-family:'Sora',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all var(--transition)}
+  .cal-btn:hover{background:var(--blue-mid);color:white}
+  .header-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#F07B30);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;color:white;cursor:pointer;border:2px solid white;box-shadow:0 0 0 2px var(--gold);flex-shrink:0}
+
+  /* ── CONSOLE (APP LAUNCHER) ── */
+  .dot-grid{width:16px;height:16px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:2px}
+  .dot-grid span{border-radius:50%;background:currentColor}
+
+  /* ── CONTENT ── */
+  #content{flex:1;overflow-y:auto;padding:20px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+  #content::-webkit-scrollbar{width:5px}
+  #content::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px}
+  .page{display:none;animation:fadeIn 0.2s ease}
+  .page.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ── PAGE HEADER ── */
+  .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .page-header-left h1{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:var(--text-dark);margin-bottom:1px}
+  .page-header-left p{font-size:12.5px;color:var(--text-muted)}
+  .page-header-right{display:flex;gap:7px;align-items:center}
+
+  /* ── BUTTONS ── */
+  .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;transition:all var(--transition);border:none;white-space:nowrap}
+  .btn-primary{background:var(--blue-mid);color:white}
+  .btn-primary:hover{background:var(--blue-dark)}
+  .btn-outline{background:white;color:var(--blue-mid);border:1.5px solid var(--blue-mid)}
+  .btn-outline:hover{background:var(--blue-pale)}
+  .btn-sm{padding:5px 11px;font-size:12px}
+  .btn-gold{background:var(--gold);color:white}
+  .btn-green{background:var(--green);color:white}
+  .btn-green:hover{background:#1d7038}
+  .btn-ghost{background:transparent;color:var(--text-mid);border:1.5px solid var(--border)}
+  .btn-ghost:hover{background:var(--surface)}
+
+  /* ── CARDS ── */
+  .card{background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden}
+  .card-header{padding:14px 18px 11px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+  .card-title{font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;color:var(--text-dark);display:flex;align-items:center;gap:7px}
+  .card-body{padding:18px}
+
+  /* ── GRIDS ── */
+  .grid{display:grid;gap:14px}
+  .g-4{grid-template-columns:repeat(4,1fr)}
+  .g-3{grid-template-columns:repeat(3,1fr)}
+  .g-2{grid-template-columns:repeat(2,1fr)}
+  .g-2-1{grid-template-columns:2fr 1fr}
+  .g-1-2{grid-template-columns:1fr 2fr}
+
+  /* ── STAT CARDS ── */
+  .stat-card{background:white;border-radius:var(--radius);border:1px solid var(--border);padding:16px 18px;display:flex;align-items:center;gap:12px;transition:all var(--transition);cursor:pointer;box-shadow:var(--shadow-sm)}
+  .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+  .stat-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .stat-info .val{font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:var(--text-dark);line-height:1.1}
+  .stat-info .lbl{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+  .stat-info .chg{font-size:10.5px;font-weight:600;margin-top:3px}
+  .chg.up{color:var(--green)}.chg.down{color:var(--red)}
+
+  /* ── CHIPS ── */
+  .chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+  .chip.green{background:var(--green-light);color:var(--green)}
+  .chip.blue{background:var(--blue-pale);color:var(--blue-mid)}
+  .chip.gold{background:var(--gold-light);color:var(--gold)}
+  .chip.red{background:var(--red-light);color:var(--red)}
+  .chip.purple{background:var(--purple-light);color:var(--purple)}
+  .chip.orange{background:var(--orange-light);color:var(--orange)}
+  .chip.gray{background:#F0F2F5;color:#5A6A8A}
+
+  /* ── TABLE ── */
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  thead th{text-align:left;padding:9px 13px;background:var(--surface);color:var(--text-muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1.5px solid var(--border);white-space:nowrap}
+  tbody td{padding:11px 13px;border-bottom:1px solid var(--border);color:var(--text-dark);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover td{background:var(--surface)}
+  .td-link{color:var(--blue-mid);font-weight:500;cursor:pointer;text-decoration:none}
+  .td-link:hover{text-decoration:underline}
+
+  /* ── AVATAR ── */
+  .avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:white;flex-shrink:0}
+  .avatar-sm{width:28px;height:28px;font-size:10px}
+  .avatar-ring{display:flex}
+  .avatar-ring .avatar{border:2px solid white;margin-left:-6px}
+  .avatar-ring .avatar:first-child{margin-left:0}
+
+  /* ── FORM ── */
+  .form-group{margin-bottom:14px}
+  .form-label{font-size:12px;font-weight:600;color:var(--text-mid);margin-bottom:5px;display:block}
+  .form-input{width:100%;border:1.5px solid var(--border);border-radius:7px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-dark);background:white;outline:none;transition:all var(--transition)}
+  .form-input:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(74,114,206,0.08)}
+  select.form-input{cursor:pointer}
+  .filter-row{display:grid;gap:10px;margin-bottom:12px}
+  .filter-bar{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:14px}
+  .filter-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+
+  /* ── TABS ── */
+  .tab-strip{display:flex;gap:3px;background:var(--surface);border-radius:9px;padding:3px;margin-bottom:16px;border:1px solid var(--border);width:fit-content}
+  .tab-btn{padding:6px 14px;border:none;background:transparent;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;color:var(--text-muted);cursor:pointer;transition:all var(--transition);white-space:nowrap}
+  .tab-btn.active{background:white;color:var(--blue-mid);font-weight:600;box-shadow:var(--shadow-sm)}
+  .page-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:18px}
+  .page-tab{padding:8px 18px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all var(--transition)}
+  .page-tab.active{color:var(--blue-mid);border-bottom-color:var(--blue-mid);font-weight:600}
+  .page-tab:hover{color:var(--blue-mid)}
+
+  /* ── PROGRESS ── */
+  .progress-wrap{margin-bottom:11px}
+  .progress-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:var(--text-mid)}
+  .progress-track{height:6px;background:var(--border);border-radius:10px;overflow:hidden}
+  .progress-fill{height:100%;border-radius:10px}
+
+  /* ── LEAVE BARS ── */
+  .leave-bar{margin-bottom:12px}
+  .leave-bar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;color:var(--text-mid)}
+  .leave-bar-track{height:6px;background:var(--border);border-radius:10px;overflow:hidden}
+  .leave-bar-fill{height:100%;border-radius:10px}
+
+  /* ── PROFILE ── */
+  .profile-hero{background:linear-gradient(135deg,var(--blue-dark),var(--blue-mid));border-radius:13px;padding:24px 28px;display:flex;align-items:center;gap:20px;margin-bottom:18px;color:white;position:relative;overflow:hidden}
+  .profile-hero::before{content:'';position:absolute;right:-30px;bottom:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.06)}
+  .profile-avatar{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#F07B30);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:24px;font-weight:700;color:white;border:3px solid rgba(255,255,255,0.3);flex-shrink:0}
+
+  /* ── K APPLY specific ── */
+  .profile-status{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:4px;font-size:11px;font-weight:600;border:1px solid}
+  .ps-verified-cond{background:#EBF4FF;color:#1A6FBF;border-color:#A8C8EF}
+  .ps-verified-uncond{background:#E6FAF0;color:#1A7A44;border-color:#84D9A4}
+  .ps-draft{background:#FFF4E5;color:#B45C00;border-color:#F5C580}
+  .flag-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;border:1px solid #E0E6F4;background:white}
+  .app-status-bar{display:flex;align-items:center;gap:6px}
+  .app-status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#F0F2F5;color:var(--text-mid)}
+
+  /* ── EVENTS ── */
+  .event-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:all var(--transition);cursor:pointer}
+  .event-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+  .event-type-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:600;margin-bottom:8px}
+  .evt-summit{background:#FFF0E6;color:#C4530A}
+  .evt-conference{background:#EBF3FF;color:#1B5CC4}
+  .evt-workshop{background:#E8F7EE;color:#1A7A44}
+  .evt-webinar{background:#F0EBFF;color:#6B3EC4}
+  .evt-fair{background:#FFF8E0;color:#B08800}
+  .evt-free{background:#E8F7EE;color:#1A7A44;margin-left:6px}
+  .event-month-section{margin-bottom:24px}
+  .event-month-header{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+  .event-month-title{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--text-dark)}
+  .event-month-count{font-size:12px;color:var(--text-muted)}
+  .event-month-line{flex:1;height:1px;background:var(--border)}
+  .event-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .event-meta{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);margin-top:6px}
+  .event-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+  .event-tag{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:11px;color:var(--text-muted)}
+  .event-btn{width:100%;padding:9px;margin-top:12px;background:var(--blue-mid);color:white;border:none;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;transition:background var(--transition)}
+  .event-btn:hover{background:var(--blue-dark)}
+
+  /* ── KNOWLEDGEBASE ── */
+  .kb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .kb-folder{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px;position:relative;cursor:pointer;transition:all var(--transition)}
+  .kb-folder:hover{box-shadow:var(--shadow-md);border-color:var(--blue-light)}
+  .kb-folder-icon{font-size:30px;margin-bottom:10px}
+  .kb-folder-name{font-size:13.5px;font-weight:600;color:var(--text-dark);margin-bottom:4px}
+  .kb-folder-count{font-size:11.5px;color:var(--text-muted)}
+  .kb-folder-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+  .kb-action-btn{width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:white;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;color:var(--text-muted);transition:all var(--transition)}
+  .kb-action-btn:hover{background:var(--blue-pale);color:var(--blue-mid);border-color:var(--blue-light)}
+  .kb-navigate{margin-left:auto;color:var(--blue-mid);font-size:18px;cursor:pointer}
+  .kb-pin{position:absolute;top:10px;right:10px;font-size:14px;color:var(--text-muted)}
+  .kb-pin.pinned{color:var(--gold)}
+  .kb-checkbox{position:absolute;top:10px;right:28px;width:15px;height:15px;border:1.5px solid var(--border);border-radius:3px;cursor:pointer}
+
+  /* ── MOM ── */
+  .mom-filter{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:14px}
+  .mom-filter-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:10px}
+  .mom-filter-grid2{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+  /* ── TASKS (GROUP VIEW) ── */
+  .task-group-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .task-group-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all var(--transition)}
+  .task-group-card:hover{box-shadow:var(--shadow-md);border-color:var(--blue-light)}
+  .tgc-name{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--blue-mid);margin-bottom:3px}
+  .tgc-desc{font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.4}
+  .tgc-meta{font-size:12px;color:var(--text-mid);margin-bottom:3px}
+  .tgc-meta span{color:var(--text-dark);font-weight:500}
+  .tgc-stats{color:var(--blue-mid);font-size:12px;font-weight:600;cursor:pointer;margin-bottom:10px}
+  .tgc-members{display:flex;align-items:center;gap:4px;margin-top:8px;padding-top:10px;border-top:1px solid var(--border)}
+  .tgc-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:9px;font-weight:700;color:white;border:2px solid white;margin-left:-4px;flex-shrink:0}
+  .tgc-avatar:first-child{margin-left:0}
+  .tgc-more{width:26px;height:26px;border-radius:50%;background:var(--surface);border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--text-muted);margin-left:-4px}
+  .task-header-tabs{display:flex;gap:20px;align-items:center}
+  .task-view-tab{display:flex;align-items:center;gap:5px;padding:6px 0;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition)}
+  .task-view-tab.active{color:var(--blue-mid);border-bottom-color:var(--blue-mid)}
+  .task-view-tab:hover{color:var(--blue-mid)}
+
+  /* ── REPORTS ── */
+  .report-section-title{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--text-dark);margin-bottom:4px}
+  .report-section-sub{font-size:12px;color:var(--text-muted);margin-bottom:14px}
+  .report-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+  .report-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px;cursor:pointer;transition:all var(--transition)}
+  .report-card:hover{box-shadow:var(--shadow-md);border-color:var(--blue-light)}
+  .report-card-title{font-size:13.5px;font-weight:600;color:var(--blue-mid);margin-bottom:6px}
+  .report-card-desc{font-size:12px;color:var(--text-muted);line-height:1.45;margin-bottom:12px}
+  .report-fetch{color:var(--green);font-size:12.5px;font-weight:600;cursor:pointer}
+  .report-fetch:hover{text-decoration:underline}
+
+  /* ── COMMISSION ── */
+  .claim-hero{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px}
+  .claim-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+  .claim-card.primary{background:linear-gradient(135deg,var(--blue-dark),var(--blue-mid));color:white;border:none}
+  .claim-label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+  .claim-card.primary .claim-label{color:rgba(255,255,255,0.7)}
+  .claim-val{font-family:'Sora',sans-serif;font-size:28px;font-weight:700}
+  .claim-sub{font-size:12px;margin-top:4px}
+  .claim-card.primary .claim-sub{color:rgba(255,255,255,0.6)}
+
+  /* ── COMPANY PROFILE TABS ── */
+  .cp-tab-bar{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:18px;overflow-x:auto}
+  .cp-tab{padding:9px 16px;border:none;background:transparent;font-size:12.5px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all var(--transition)}
+  .cp-tab.active{color:var(--blue-mid);border-bottom-color:var(--blue-mid);font-weight:600}
+
+  /* ── ESCALATION / RM CONTACTS ── */
+  .rm-panel{background:white;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-width:480px}
+  .rm-panel-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .rm-panel-icon{width:36px;height:36px;border-radius:50%;background:var(--blue-pale);display:flex;align-items:center;justify-content:center;font-size:18px}
+  .rm-contact-tabs{display:flex;gap:0;padding:10px 16px 0;border-bottom:1px solid var(--border)}
+  .rm-ctab{display:flex;align-items:center;gap:6px;padding:7px 12px;font-size:12px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--transition)}
+  .rm-ctab.active{color:var(--blue-mid);border-bottom-color:var(--blue-mid)}
+  .rm-ctab .dot{width:7px;height:7px;border-radius:50%;background:var(--border)}
+  .rm-ctab.active .dot{background:var(--blue-mid)}
+  .rm-contact-card{margin:14px 16px;border:1px solid var(--border);border-radius:10px;padding:14px}
+  .rm-contact-name{font-size:14px;font-weight:700;color:var(--text-dark)}
+  .rm-contact-role{font-size:12px;color:var(--text-muted);margin-bottom:10px}
+  .rm-contact-detail{display:flex;align-items:center;gap:6px;font-size:12.5px;margin-bottom:5px}
+  .rm-contact-actions{display:flex;gap:8px;margin-top:12px}
+  .rm-action-btn{flex:1;padding:7px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;text-align:center;border:1.5px solid}
+  .rm-wa{background:#E8F7EE;color:#1A7A44;border-color:#84D9A4}
+  .rm-meet{background:var(--blue-pale);color:var(--blue-mid);border-color:rgba(74,114,206,0.3)}
+  .rm-footer{padding:10px 16px;font-size:11px;color:var(--text-muted);background:var(--surface);border-top:1px solid var(--border)}
+
+  /* ── HELP DESK ── */
+  .ticket-item{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+  .ticket-item:last-child{border-bottom:none}
+  .ticket-num{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text-muted);flex-shrink:0;width:72px;padding-top:2px}
+  .ticket-main{flex:1}
+  .ticket-subject{font-size:13px;font-weight:500;margin-bottom:3px}
+  .ticket-meta{font-size:11.5px;color:var(--text-muted)}
+
+  /* ── VAS ── */
+  .vas-service-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:18px;text-align:center;cursor:pointer;transition:all var(--transition)}
+  .vas-service-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--blue-light)}
+  .vas-icon{font-size:32px;margin-bottom:10px}
+  .vas-name{font-size:13.5px;font-weight:600;color:var(--text-dark);margin-bottom:4px}
+  .vas-desc{font-size:11.5px;color:var(--text-muted);line-height:1.4;margin-bottom:12px}
+  .vas-count{font-family:'Sora',sans-serif;font-size:11px;color:var(--blue-mid);font-weight:600}
+
+  /* ── CATEGORY CARDS ── */
+  .category-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+  .category-card{background:white;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px 46px;cursor:pointer;transition:all var(--transition);position:relative;box-shadow:var(--shadow-sm)}
+  .category-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--blue-light)}
+  .category-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:10px}
+  .category-title{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--text-dark)}
+  .category-sub{font-size:11px;color:var(--text-muted);margin-top:1px;margin-bottom:8px}
+  .category-desc{font-size:12px;color:var(--text-mid);line-height:1.5}
+  .category-arrow{position:absolute;bottom:14px;right:16px;width:30px;height:30px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text-mid);transition:all var(--transition)}
+  .category-card:hover .category-arrow{background:var(--blue-mid);color:white}
+
+  /* ── QUICK LINKS ── */
+  .quick-links{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:18px}
+  .ql-item{background:white;border:1.5px solid var(--border);border-radius:9px;padding:10px 8px;text-align:center;cursor:pointer;transition:all var(--transition);position:relative}
+  .ql-item:hover{border-color:var(--blue-light);background:var(--blue-pale);transform:translateY(-2px)}
+  .ql-icon{font-size:20px;margin-bottom:4px}
+  .ql-label{font-size:10.5px;font-weight:500;color:var(--text-mid);line-height:1.2}
+
+  /* ── MISC ── */
+  .empty-state{text-align:center;padding:36px 20px;color:var(--text-muted)}
+  .empty-state .es-icon{font-size:38px;margin-bottom:10px}
+  .mini-tag{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2px 8px;font-size:11px;color:var(--text-muted);margin:2px}
+  .section-divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+  .inline-icon{font-size:14px;vertical-align:middle}
+  .text-link{color:var(--blue-mid);cursor:pointer;font-weight:500}
+  .text-link:hover{text-decoration:underline}
+
+  /* ── NOTIFICATIONS ── */
+  .notif-panel{position:fixed;top:60px;right:14px;width:310px;background:white;border:1px solid var(--border);border-radius:13px;box-shadow:var(--shadow-lg);z-index:200;display:none;animation:slideDown 0.18s ease}
+  .notif-panel.show{display:block}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+  .notif-header{padding:13px 16px 9px;border-bottom:1px solid var(--border);font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+  .notif-item{display:flex;gap:11px;padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background var(--transition)}
+  .notif-item:hover{background:var(--surface)}
+  .notif-item:last-child{border-bottom:none}
+  .notif-ico{font-size:18px;flex-shrink:0;margin-top:1px}
+  .notif-text{font-size:12px;color:var(--text-dark);line-height:1.4}
+  .notif-time{font-size:10.5px;color:var(--text-muted);margin-top:2px}
+
+  /* ── TASK CHECK ── */
+  .task-item{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+  .task-item:last-child{border-bottom:none}
+  .task-check{width:17px;height:17px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;cursor:pointer;transition:all var(--transition);display:flex;align-items:center;justify-content:center;font-size:9px;color:white}
+  .task-check.done{background:var(--green);border-color:var(--green)}
+  .task-text{flex:1;font-size:12.5px}
+  .task-text.done{text-decoration:line-through;color:var(--text-muted)}
+  .task-due{font-size:11px;color:var(--text-muted);white-space:nowrap}
+  .task-due.overdue{color:var(--red);font-weight:600}
+
+  /* ── CALENDAR ── */
+  .cal-nav{display:flex;align-items:center;justify-content:space-between;padding:0 4px;margin-bottom:10px}
+  .cal-nav-btn{width:26px;height:26px;border:none;background:var(--surface);border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-mid)}
+  .cal-nav-btn:hover{background:var(--blue-pale);color:var(--blue-mid)}
+  .cal-month{font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;color:var(--text-dark)}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center}
+  .cal-day-hd{font-size:10px;font-weight:700;color:var(--text-muted);padding:3px 0}
+  .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:11.5px;cursor:pointer;color:var(--text-mid);transition:all var(--transition)}
+  .cal-day:hover{background:var(--blue-pale);color:var(--blue-mid)}
+  .cal-day.today{background:var(--blue-mid);color:white;font-weight:700}
+  .cal-day.has-event{position:relative}
+  .cal-day.has-event::after{content:'';position:absolute;bottom:2px;width:4px;height:4px;border-radius:50%;background:var(--gold)}
+  .cal-day.other-month{color:var(--border)}
+
+  /* ATTEND */
+  .attend-wrap{display:flex;align-items:center;gap:18px;padding:4px 0}
+  .attend-stats{flex:1}
+  .attend-stat{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:12.5px}
+  .attend-val{font-family:'Sora',sans-serif;font-weight:700}
+
+  /* KPOINTS HERO */
+  .kpoints-hero{background:linear-gradient(135deg,#B45C00,#E8A020);border-radius:13px;padding:22px 26px;color:white;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .kpoints-val{font-family:'Sora',sans-serif;font-size:44px;font-weight:800;line-height:1}
+
+  /* BADGE */
+  .badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+  .badge-item{background:white;border:1px solid var(--border);border-radius:11px;padding:14px 10px;text-align:center;cursor:pointer;transition:transform var(--transition)}
+  .badge-item:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+  .badge-icon{font-size:28px;margin-bottom:5px}
+  .badge-name{font-size:11.5px;font-weight:600;color:var(--text-dark);margin-bottom:2px}
+  .badge-desc{font-size:10.5px;color:var(--text-muted)}
+  .badge-item.earned{border-color:var(--gold);background:var(--gold-light)}
+  .badge-item.locked{opacity:0.4}
+
+  /* LB */
+  .lb-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+  .lb-item:last-child{border-bottom:none}
+  .lb-rank{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;width:26px;text-align:center;color:var(--text-muted);flex-shrink:0}
+  .lb-pts{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:var(--gold)}
+</style>
+</head>
+<body>
+
+<!-- ════ SIDEBAR ════ -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <img src="/mnt/user-data/uploads/Kanan_New_Logo.png" alt="Kanan.co">
+  </div>
+  <div class="sidebar-nav" id="sidebarNav">
+    <div class="hub-group" data-hub="mykanan">
+      <div class="hub-title">My Kanan</div>
+      <div class="nav-item active" data-page="dashboard" onclick="navigate(this,'dashboard')"><span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span></div>
+      <div class="nav-item" data-page="ess" onclick="navigate(this,'ess')"><span class="nav-icon">👤</span><span class="nav-label">My Kanan (ESS)</span></div>
+      <div class="nav-item" data-page="payroll" onclick="navigate(this,'payroll')"><span class="nav-icon">💰</span><span class="nav-label">Payroll & Compensation</span></div>
+      <div class="nav-item" data-page="leave" onclick="navigate(this,'leave')"><span class="nav-icon">🌴</span><span class="nav-label">Leave Management</span><span class="nav-badge">2</span></div>
+      <div class="nav-item" data-page="profile" onclick="navigate(this,'profile')"><span class="nav-icon">🪪</span><span class="nav-label">Personal Profile</span></div>
+      <div class="nav-item" data-page="employees" onclick="navigate(this,'employees')"><span class="nav-icon">👥</span><span class="nav-label">All Employee Grid</span></div>
+      <div class="nav-item" data-page="policies" onclick="navigate(this,'policies')"><span class="nav-icon">📋</span><span class="nav-label">Policies & SOPs</span></div>
+      <div class="nav-item" data-page="schedule" onclick="navigate(this,'schedule')"><span class="nav-icon">🕐</span><span class="nav-label">Schedule & Attendance</span></div>
+    </div>
+    <div class="hub-group" data-hub="workhub">
+      <div class="hub-title">Work Hub</div>
+      <div class="nav-item" data-page="news" onclick="navigate(this,'news')"><span class="nav-icon">📢</span><span class="nav-label">News & Announcements</span><span class="nav-badge">3</span></div>
+      <div class="nav-item" data-page="crm" onclick="navigate(this,'crm')"><span class="nav-icon">🎯</span><span class="nav-label">CRM – Lead Management</span></div>
+      <div class="nav-item" data-page="coaching" onclick="navigate(this,'coaching')"><span class="nav-icon">🎓</span><span class="nav-label">Coaching Module</span></div>
+      <div class="nav-item" data-page="kapply" onclick="navigate(this,'kapply')"><span class="nav-icon">✈️</span><span class="nav-label">K Apply – Admissions</span></div>
+      <div class="nav-item" data-page="vas" onclick="navigate(this,'vas')"><span class="nav-icon">🛎️</span><span class="nav-label">VAS – Services</span></div>
+      <div class="nav-item" data-page="events" onclick="navigate(this,'events')"><span class="nav-icon">🎪</span><span class="nav-label">Events</span></div>
+      <div class="nav-item" data-page="kb" onclick="navigate(this,'kb')"><span class="nav-icon">📚</span><span class="nav-label">Knowledgebase</span></div>
+      <div class="nav-item" data-page="tasks" onclick="navigate(this,'tasks')"><span class="nav-icon">✅</span><span class="nav-label">My Tasks</span><span class="nav-badge">5</span></div>
+      <div class="nav-item" data-page="mom" onclick="navigate(this,'mom')"><span class="nav-icon">📝</span><span class="nav-label">MOM – Meetings</span></div>
+      <div class="nav-item" data-page="reports" onclick="navigate(this,'reports')"><span class="nav-icon">📊</span><span class="nav-label">Reports & Performance</span></div>
+    </div>
+    <div class="hub-group" data-hub="growthhub">
+      <div class="hub-title">Growth Hub</div>
+      <div class="nav-item" data-page="training" onclick="navigate(this,'training')"><span class="nav-icon">🌱</span><span class="nav-label">Training & Development</span></div>
+      <div class="nav-item" data-page="culture" onclick="navigate(this,'culture')"><span class="nav-icon">❤️</span><span class="nav-label">Culture & Engagement</span></div>
+      <div class="nav-item" data-page="leaderboard" onclick="navigate(this,'leaderboard')"><span class="nav-icon">🏆</span><span class="nav-label">Leaderboard</span></div>
+      <div class="nav-item" data-page="kpoints" onclick="navigate(this,'kpoints')"><span class="nav-icon">🪙</span><span class="nav-label">K Points – Rewards</span></div>
+      <div class="nav-item" data-page="badges" onclick="navigate(this,'badges')"><span class="nav-icon">🎖️</span><span class="nav-label">K Badge System</span></div>
+    </div>
+    <div class="hub-group" data-hub="helpdesk">
+      <div class="hub-title">Help Desk</div>
+      <div class="nav-item" data-page="helpdesk" onclick="navigate(this,'helpdesk')"><span class="nav-icon">🆘</span><span class="nav-label">Support / Help Desk</span><span class="nav-badge">1</span></div>
+      <div class="nav-item" data-page="assets" onclick="navigate(this,'assets')"><span class="nav-icon">💼</span><span class="nav-label">Asset & Resources</span></div>
+      <div class="nav-item" data-page="rooms" onclick="navigate(this,'rooms')"><span class="nav-icon">🏛️</span><span class="nav-label">Room / Auditorium Booking</span></div>
+      <div class="nav-item" data-page="requests" onclick="navigate(this,'requests')"><span class="nav-icon">📤</span><span class="nav-label">Request / Submit Asset</span></div>
+    </div>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar-sm">CP</div>
+    <div><div class="user-name-sm">Chirag Parmar</div><div class="user-email-sm">chirag@kanan.co</div></div>
+  </div>
+</nav>
+
+<!-- ════ MAIN ════ -->
+<div id="main">
+  <header id="header">
+    <button class="header-toggle" onclick="toggleSidebar()">☰</button>
+    <div class="header-title" style="cursor:pointer" onclick="navigate(document.querySelector('[data-page=dashboard]'),'dashboard')" title="Back to Dashboard">My Kanan Hub</div>
+    <div class="search-bar"><span class="search-icon">🔍</span><input type="text" placeholder="Search people, modules, documents…" id="globalSearch"></div>
+    <div class="header-actions">
+      <button class="cal-btn" onclick="navigate(document.querySelector('[data-page=schedule]'),'schedule')">📅 Calendar</button>
+      <button class="hdr-btn" id="consoleBtn" onclick="navigate(null,'console')" title="All Modules"><div class="dot-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></button>
+      <button class="hdr-btn" id="notifBtn" onclick="toggleNotif()">🔔<span class="dot"></span></button>
+      <button class="hdr-btn hdr-gear">⚙️</button>
+      <div class="header-avatar" onclick="navigate(document.querySelector('[data-page=profile]'),'profile')">CP</div>
+    </div>
+  </header>
+
+  <!-- NOTIFICATION PANEL -->
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-header">Notifications <span style="font-size:11px;color:var(--blue-mid);font-weight:500;cursor:pointer">Mark all read</span></div>
+    <div class="notif-item"><span class="notif-ico">📢</span><div><div class="notif-text">WFH policy revised — see updated SOPs</div><div class="notif-time">10 min ago</div></div></div>
+    <div class="notif-item"><span class="notif-ico">✅</span><div><div class="notif-text">Task "Q2 IELTS Report" assigned by Rahul Shah</div><div class="notif-time">1 hr ago</div></div></div>
+    <div class="notif-item"><span class="notif-ico">🌴</span><div><div class="notif-text">Leave request approved — Casual Leave (May 18)</div><div class="notif-time">2 hrs ago</div></div></div>
+    <div class="notif-item"><span class="notif-ico">🎖️</span><div><div class="notif-text">You earned the "Star Performer" badge!</div><div class="notif-time">Yesterday</div></div></div>
+    <div class="notif-item"><span class="notif-ico">🪙</span><div><div class="notif-text">+150 K Points credited for Training Module</div><div class="notif-time">2 days ago</div></div></div>
+  </div>
+
+  <div id="content">
+
+<!-- ▸ DASHBOARD ──────────────────────────────────────── -->
+<div class="page active" id="page-dashboard">
+  <div class="page-header">
+    <div class="page-header-left"><h1>Good Morning, Chirag 👋</h1><p>Wednesday, 13 May 2025 · Surat, Gujarat · <span style="color:var(--green);font-weight:600">● Checked In 9:04 AM</span></p></div>
+    <div class="page-header-right"><button class="btn btn-outline btn-sm">📥 My Inbox</button><button class="btn btn-primary btn-sm">+ New Request</button></div>
+  </div>
+  <div class="grid g-4" style="margin-bottom:16px">
+    <div class="stat-card" onclick="navigate(document.querySelector('[data-page=tasks]'),'tasks')"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">✅</div><div class="stat-info"><div class="val">5</div><div class="lbl">Pending Tasks</div><div class="chg down">2 due today</div></div></div>
+    <div class="stat-card" onclick="navigate(document.querySelector('[data-page=leave]'),'leave')"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">🌴</div><div class="stat-info"><div class="val">14</div><div class="lbl">Leave Balance</div><div class="chg up">8 CL · 6 SL left</div></div></div>
+    <div class="stat-card" onclick="navigate(document.querySelector('[data-page=kpoints]'),'kpoints')"><div class="stat-icon" style="background:var(--gold-light);color:var(--gold)">🪙</div><div class="stat-info"><div class="val">2,840</div><div class="lbl">K Points</div><div class="chg up">+150 this week</div></div></div>
+    <div class="stat-card" onclick="navigate(document.querySelector('[data-page=leaderboard]'),'leaderboard')"><div class="stat-icon" style="background:var(--purple-light);color:var(--purple)">🏆</div><div class="stat-info"><div class="val">#3</div><div class="lbl">Leaderboard Rank</div><div class="chg up">↑ 2 positions</div></div></div>
+  </div>
+  <div style="margin-bottom:7px"><span style="font-family:'Sora',sans-serif;font-size:12.5px;font-weight:700;color:var(--text-dark)">🧭 Explore Modules</span></div>
+  <div class="category-grid">
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=ess]'),'ess')">
+      <div class="category-icon" style="background:var(--blue-pale);color:var(--blue-mid)">🪪</div>
+      <div class="category-title">Kanan HRM</div>
+      <div class="category-sub">Employee Self-Service</div>
+      <div class="category-desc">Manage payroll, leave, personal profile, attendance and HR policies in one place.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=kapply]'),'kapply')">
+      <div class="category-icon" style="background:var(--red-light);color:var(--red)">✈️</div>
+      <div class="category-title">K Apply — Admissions</div>
+      <div class="category-sub">600+ Partner Institutions</div>
+      <div class="category-desc">Process student applications across partner institutions in Canada, USA, UK, Germany and Dubai.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=coaching]'),'coaching')">
+      <div class="category-icon" style="background:var(--blue-pale);color:var(--blue-mid)">🎓</div>
+      <div class="category-title">Coaching Module</div>
+      <div class="category-sub">eLearning Platform</div>
+      <div class="category-desc">Deliver live classes, mock tests, lessons and practice exams for study-abroad success.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=crm]'),'crm')">
+      <div class="category-icon" style="background:var(--orange-light);color:var(--orange)">🎯</div>
+      <div class="category-title">CRM — Lead Management</div>
+      <div class="category-sub">Sales & Leads</div>
+      <div class="category-desc">Track, assign and convert leads across all branches and counsellors.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=vas]'),'vas')">
+      <div class="category-icon" style="background:var(--purple-light);color:var(--purple)">🛎️</div>
+      <div class="category-title">VAS Services</div>
+      <div class="category-sub">Holistic Student Services</div>
+      <div class="category-desc">Provide loans, SOP support, remittance, tickets, insurance and other essential student services.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=events]'),'events')">
+      <div class="category-icon" style="background:var(--gold-light);color:var(--gold)">🎪</div>
+      <div class="category-title">Events</div>
+      <div class="category-sub">Virtual Education Fairs</div>
+      <div class="category-desc">Conduct study-abroad fairs that help nurture your existing leads and build traction.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=training]'),'training')">
+      <div class="category-icon" style="background:var(--green-light);color:var(--green)">🌱</div>
+      <div class="category-title">Growth Hub</div>
+      <div class="category-sub">Train the Team</div>
+      <div class="category-desc">Training & development, culture, leaderboards, K Points and badge achievements.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=tasks]'),'tasks')">
+      <div class="category-icon" style="background:var(--blue-pale);color:var(--blue-mid)">📝</div>
+      <div class="category-title">Task Management</div>
+      <div class="category-sub">Productivity Tracker</div>
+      <div class="category-desc">A smart task manager for seamless tracking, collaboration and MOM logging.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=helpdesk]'),'helpdesk')">
+      <div class="category-icon" style="background:var(--red-light);color:var(--red)">🆘</div>
+      <div class="category-title">Helpdesk</div>
+      <div class="category-sub">Support Hub</div>
+      <div class="category-desc">Submit queries online and track resolution progress seamlessly.</div>
+      <div class="category-arrow">→</div>
+    </div>
+  </div>
+  <div style="margin-bottom:7px;display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Sora',sans-serif;font-size:12.5px;font-weight:700;color:var(--text-dark)">⚡ Quick Links & Favourites</span><span style="font-size:12px;color:var(--blue-mid);cursor:pointer;font-weight:500">Edit</span></div>
+  <div class="quick-links">
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=leave]'),'leave')"><div class="ql-icon">🌴</div><div class="ql-label">Apply Leave</div></div>
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=tasks]'),'tasks')"><div class="ql-icon">✅</div><div class="ql-label">My Tasks</div></div>
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=crm]'),'crm')"><div class="ql-icon">🎯</div><div class="ql-label">CRM Leads</div></div>
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=kapply]'),'kapply')"><div class="ql-icon">✈️</div><div class="ql-label">K Apply</div></div>
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=kb]'),'kb')"><div class="ql-icon">📚</div><div class="ql-label">Knowledgebase</div></div>
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=mom]'),'mom')"><div class="ql-icon">📝</div><div class="ql-label">MOM</div></div>
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=rooms]'),'rooms')"><div class="ql-icon">🏛️</div><div class="ql-label">Book Room</div></div>
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=helpdesk]'),'helpdesk')"><div class="ql-icon">🆘</div><div class="ql-label">Raise Ticket</div></div>
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=payroll]'),'payroll')"><div class="ql-icon">💰</div><div class="ql-label">Payslips</div></div>
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=events]'),'events')"><div class="ql-icon">🎪</div><div class="ql-label">Events</div></div>
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=reports]'),'reports')"><div class="ql-icon">📊</div><div class="ql-label">Reports</div></div>
+    <div class="ql-item" onclick="navigate(document.querySelector('[data-page=kpoints]'),'kpoints')"><div class="ql-icon">🪙</div><div class="ql-label">K Points</div></div>
+  </div>
+  <div class="grid g-2-1" style="margin-top:2px">
+    <div class="grid" style="gap:14px">
+      <div class="card"><div class="card-header"><span class="card-title">✅ My Tasks</span><button class="btn btn-primary btn-sm" onclick="navigate(document.querySelector('[data-page=tasks]'),'tasks')">View All</button></div>
+        <div class="card-body" style="padding-top:6px;padding-bottom:6px">
+          <div class="task-item"><div class="task-check done" onclick="toggleTask(this)">✓</div><div class="task-text done">Send IELTS batch schedule to trainer</div><div class="task-due">Done</div></div>
+          <div class="task-item"><div class="task-check" onclick="toggleTask(this)"></div><div class="task-text">Follow up with Priya Mehta – visa docs</div><div class="task-due overdue">Overdue</div></div>
+          <div class="task-item"><div class="task-check" onclick="toggleTask(this)"></div><div class="task-text">Update Q2 lead report for Surat branch</div><div class="task-due">Today</div></div>
+          <div class="task-item"><div class="task-check" onclick="toggleTask(this)"></div><div class="task-text">Review SOPs for K Apply agent guide</div><div class="task-due">May 15</div></div>
+          <div class="task-item"><div class="task-check" onclick="toggleTask(this)"></div><div class="task-text">Prepare MOM for weekly sync meeting</div><div class="task-due">May 16</div></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-header"><span class="card-title">📢 Announcements</span><button class="btn btn-outline btn-sm" onclick="navigate(document.querySelector('[data-page=news]'),'news')">All News</button></div>
+        <div class="card-body" style="padding-top:4px;padding-bottom:4px">
+          <div style="display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--border)"><div style="width:7px;height:7px;border-radius:50%;background:var(--blue-mid);margin-top:5px;flex-shrink:0"></div><div><div style="font-size:13px;font-weight:500;margin-bottom:3px">Q2 All-Hands Meeting — May 20, 2025</div><div style="font-size:11px;color:var(--text-muted)"><span class="chip blue" style="font-size:10px">Company</span> 2 hours ago</div></div></div>
+          <div style="display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--border)"><div style="width:7px;height:7px;border-radius:50%;background:var(--green);margin-top:5px;flex-shrink:0"></div><div><div style="font-size:13px;font-weight:500;margin-bottom:3px">New IELTS Batch Starting June 1 — Enroll Now</div><div style="font-size:11px;color:var(--text-muted)"><span class="chip green" style="font-size:10px">Coaching</span> Yesterday</div></div></div>
+          <div style="display:flex;gap:11px;padding:12px 0"><div style="width:7px;height:7px;border-radius:50%;background:var(--gold);margin-top:5px;flex-shrink:0"></div><div><div style="font-size:13px;font-weight:500;margin-bottom:3px">WFH Policy Revised — Effective June 2025</div><div style="font-size:11px;color:var(--text-muted)"><span class="chip gold" style="font-size:10px">HR Policy</span> 2 days ago</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid" style="gap:14px">
+      <div class="card"><div class="card-header"><span class="card-title">📅 Calendar</span></div><div class="card-body"><div id="miniCal"></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">🕐 Attendance</span><span class="chip green">✓ Present</span></div>
+        <div class="card-body">
+          <div class="attend-wrap">
+            <svg width="80" height="80" viewBox="0 0 80 80"><circle fill="none" stroke="var(--border)" stroke-width="7" cx="40" cy="40" r="32"/><circle fill="none" stroke="var(--green)" stroke-width="7" stroke-linecap="round" cx="40" cy="40" r="32" stroke-dasharray="201.1" stroke-dashoffset="40.2" transform="rotate(-90 40 40)"/><text x="40" y="38" text-anchor="middle" dominant-baseline="middle" font-family="Sora,sans-serif" font-size="13" font-weight="700" fill="var(--text-dark)">94%</text><text x="40" y="52" text-anchor="middle" font-size="8" fill="var(--text-muted)">This Month</text></svg>
+            <div class="attend-stats">
+              <div class="attend-stat"><span>Present</span><span class="attend-val" style="color:var(--green)">21</span></div>
+              <div class="attend-stat"><span>Absent</span><span class="attend-val" style="color:var(--red)">1</span></div>
+              <div class="attend-stat"><span>WFH</span><span class="attend-val" style="color:var(--blue-mid)">3</span></div>
+              <div class="attend-stat"><span>Check-in</span><span class="attend-val">9:04 AM</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card"><div class="card-header"><span class="card-title">🌴 Leave Balance</span></div>
+        <div class="card-body">
+          <div class="leave-bar"><div class="leave-bar-label"><span>Casual</span><span>8/12</span></div><div class="leave-bar-track"><div class="leave-bar-fill" style="width:66%;background:var(--blue-mid)"></div></div></div>
+          <div class="leave-bar"><div class="leave-bar-label"><span>Sick</span><span>6/8</span></div><div class="leave-bar-track"><div class="leave-bar-fill" style="width:75%;background:var(--green)"></div></div></div>
+          <div class="leave-bar"><div class="leave-bar-label"><span>Earned</span><span>5/15</span></div><div class="leave-bar-track"><div class="leave-bar-fill" style="width:33%;background:var(--gold)"></div></div></div>
+          <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-top:4px" onclick="navigate(document.querySelector('[data-page=leave]'),'leave')">Apply Leave</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▸ CONSOLE — FULL APP LAUNCHER ──────────────────────────────────────── -->
+<div class="page" id="page-console">
+  <div class="category-grid" style="margin-top:6px">
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=ess]'),'ess')">
+      <div class="category-icon" style="background:var(--blue-pale);color:var(--blue-mid)">🪪</div>
+      <div class="category-title">Kanan HRM</div>
+      <div class="category-sub">Employee Self-Service</div>
+      <div class="category-desc">Manage payroll, leave, personal profile, attendance and HR policies in one place.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=kapply]'),'kapply')">
+      <div class="category-icon" style="background:var(--red-light);color:var(--red)">✈️</div>
+      <div class="category-title">K Apply — Admissions</div>
+      <div class="category-sub">600+ Partner Institutions</div>
+      <div class="category-desc">Process student applications across partner institutions in Canada, USA, UK, Germany and Dubai.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=coaching]'),'coaching')">
+      <div class="category-icon" style="background:var(--blue-pale);color:var(--blue-mid)">🎓</div>
+      <div class="category-title">Coaching Module</div>
+      <div class="category-sub">eLearning Platform</div>
+      <div class="category-desc">Deliver live classes, mock tests, lessons and practice exams for study-abroad success.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=crm]'),'crm')">
+      <div class="category-icon" style="background:var(--orange-light);color:var(--orange)">🎯</div>
+      <div class="category-title">CRM — Lead Management</div>
+      <div class="category-sub">Sales & Leads</div>
+      <div class="category-desc">Track, assign and convert leads across all branches and counsellors.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=vas]'),'vas')">
+      <div class="category-icon" style="background:var(--purple-light);color:var(--purple)">🛎️</div>
+      <div class="category-title">VAS Services</div>
+      <div class="category-sub">Holistic Student Services</div>
+      <div class="category-desc">Provide loans, SOP support, remittance, tickets, insurance and other essential student services.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=events]'),'events')">
+      <div class="category-icon" style="background:var(--gold-light);color:var(--gold)">🎪</div>
+      <div class="category-title">Events</div>
+      <div class="category-sub">Virtual Education Fairs</div>
+      <div class="category-desc">Conduct study-abroad fairs that help nurture your existing leads and build traction.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=training]'),'training')">
+      <div class="category-icon" style="background:var(--green-light);color:var(--green)">🌱</div>
+      <div class="category-title">Growth Hub</div>
+      <div class="category-sub">Train the Team</div>
+      <div class="category-desc">Training & development, culture, leaderboards, K Points and badge achievements.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=tasks]'),'tasks')">
+      <div class="category-icon" style="background:var(--blue-pale);color:var(--blue-mid)">📝</div>
+      <div class="category-title">Task Management</div>
+      <div class="category-sub">Productivity Tracker</div>
+      <div class="category-desc">A smart task manager for seamless tracking, collaboration and MOM logging.</div>
+      <div class="category-arrow">→</div>
+    </div>
+    <div class="category-card" onclick="navigate(document.querySelector('[data-page=helpdesk]'),'helpdesk')">
+      <div class="category-icon" style="background:var(--red-light);color:var(--red)">🆘</div>
+      <div class="category-title">Helpdesk</div>
+      <div class="category-sub">Support Hub</div>
+      <div class="category-desc">Submit queries online and track resolution progress seamlessly.</div>
+      <div class="category-arrow">→</div>
+    </div>
+  </div>
+</div>
+
+<!-- ▸ K APPLY ──────────────────────────────────────── -->
+<div class="page" id="page-kapply">
+  <div class="page-header">
+    <div class="page-header-left"><h1>✈️ K Apply — Admission Management</h1><p>B2B Partner student application pipeline</p></div>
+    <div class="page-header-right">
+      <button class="btn btn-ghost btn-sm">📤 Export CSV</button>
+      <button class="btn btn-ghost btn-sm">👥 User Count</button>
+      <button class="btn btn-primary">+ Add Student</button>
+    </div>
+  </div>
+
+  <!-- SUB-NAV (mirrors K Apply sidebar) -->
+  <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)">
+    <button class="page-tab active" onclick="switchKApplyTab(this,'students')">Student Profiles</button>
+    <button class="page-tab" onclick="switchKApplyTab(this,'commission')">Commission</button>
+    <button class="page-tab" onclick="switchKApplyTab(this,'company')">Partner Profiles</button>
+    <button class="page-tab" onclick="switchKApplyTab(this,'escalation')">Escalation Contacts</button>
+    <button class="page-tab" onclick="switchKApplyTab(this,'kapply-reports')">K Apply Reports</button>
+  </div>
+
+  <!-- STUDENTS TAB -->
+  <div id="kapply-students">
+    <div class="grid g-4" style="margin-bottom:16px">
+      <div class="stat-card"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">👥</div><div class="stat-info"><div class="val">1,248</div><div class="lbl">Total Students</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:var(--gold-light);color:var(--gold)">⏳</div><div class="stat-info"><div class="val">214</div><div class="lbl">Docs Pending</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">🎓</div><div class="stat-info"><div class="val">389</div><div class="lbl">Offer Letters</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:var(--purple-light);color:var(--purple)">🛂</div><div class="stat-info"><div class="val">142</div><div class="lbl">Visa Applied</div></div></div>
+    </div>
+    <!-- Tabs: Active / Archived -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="tab-strip">
+        <button class="tab-btn active">Active List</button>
+        <button class="tab-btn">Archived List</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="position:relative"><input type="text" class="form-input btn-sm" style="width:240px;padding-left:30px" placeholder="Search students name, code, mobile…"><span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text-muted)">🔍</span></div>
+        <button class="btn btn-ghost btn-sm">⟳</button>
+        <button class="btn btn-ghost btn-sm">▤</button>
+      </div>
+    </div>
+    <!-- Filter Bar -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <button class="btn btn-ghost btn-sm" style="gap:6px">🔽 Filter <span style="font-size:11px;color:var(--text-muted)">›</span></button>
+    </div>
+    <!-- Table -->
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student Code</th><th>Name</th><th>Profile Status</th><th>Application Status</th><th>Email / Mobile</th><th>Account Name</th><th>Location</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px">00895525</span> <span style="font-size:11px;color:var(--text-muted);cursor:pointer">⧉</span></td>
+              <td><b>MOHD SHADAN .</b></td>
+              <td><span class="profile-status ps-verified-cond">🇬🇧 Verified (Conditional-Academic)</span></td>
+              <td><div class="app-status-bar"><span class="flag-chip">🇬🇧</span><span class="app-status-pill">1 Refund Received</span><span style="font-size:14px;cursor:pointer;color:var(--blue-mid)">👁</span></div></td>
+              <td style="font-size:12px">sha****@gmail.com<br>+91 95*****75</td>
+              <td style="font-size:12px">iExplain Education Private Limited</td>
+              <td style="font-size:12px">India / Uttar Pradesh</td>
+            </tr>
+            <tr>
+              <td><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px">00918953</span></td>
+              <td><b>Harvinder Singh</b></td>
+              <td><span class="profile-status ps-draft">🇨🇦 Draft</span></td>
+              <td><span class="app-status-pill" style="background:#F0F2F5;color:var(--text-muted)">No Application</span></td>
+              <td style="font-size:12px">har****@outlook.com<br>+91 16*****156</td>
+              <td style="font-size:12px">GMAP IMMIGRATION</td>
+              <td style="font-size:12px">— / — / —</td>
+            </tr>
+            <tr>
+              <td><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px">00872305</span></td>
+              <td><b>KRIMA NILESH PATEL</b></td>
+              <td><span class="profile-status ps-verified-uncond">🇨🇦 Verified (Unconditional)</span></td>
+              <td><div class="app-status-bar"><span class="flag-chip">🇨🇦</span><span class="app-status-pill">1 Offer Approved</span><span style="font-size:14px;cursor:pointer;color:var(--blue-mid)">👁</span></div></td>
+              <td style="font-size:12px">kkr****@gmail.com<br>+91 70*****50</td>
+              <td style="font-size:12px">Storm EduGo GNR</td>
+              <td style="font-size:12px">India / Gujarat</td>
+            </tr>
+            <tr>
+              <td><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px">00904818</span></td>
+              <td><b>ASHVEEN KAUR MUTTI</b></td>
+              <td><span class="profile-status ps-verified-cond">🇬🇧 Verified (Conditional-Academic)</span></td>
+              <td><div class="app-status-bar"><span class="flag-chip">🇬🇧</span><span class="app-status-pill">1 Application Submitted To University</span><span style="font-size:14px;cursor:pointer;color:var(--blue-mid)">👁</span></div></td>
+              <td style="font-size:12px">ash****@gmail.com<br>+91 78*****56</td>
+              <td style="font-size:12px">Guru Kirpa Computer PTE & IELTS Institute</td>
+              <td style="font-size:12px">India / Punjab</td>
+            </tr>
+            <tr>
+              <td><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px">00918705</span></td>
+              <td><b>PRINCE PRAFULBHAI PATEL</b></td>
+              <td><span class="profile-status ps-verified-cond">🇬🇧 Verified (Conditional-Academic)</span></td>
+              <td><div class="app-status-bar"><span class="flag-chip">🇬🇧</span><span class="app-status-pill">1 Application Assigned</span><span style="font-size:14px;cursor:pointer;color:var(--blue-mid)">👁</span></div></td>
+              <td style="font-size:12px">pri****@gmail.com<br>+91 70*****87</td>
+              <td style="font-size:12px">Mahatma Gandhi Center of International Studies</td>
+              <td style="font-size:12px">India / Gujarat / Navsari</td>
+            </tr>
+            <tr>
+              <td><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px">00895182</span></td>
+              <td><b>SIMRANJIT KAUR</b></td>
+              <td><span class="profile-status ps-verified-cond">🇬🇧 Verified (Conditional-Academic)</span></td>
+              <td><div class="app-status-bar"><span class="flag-chip" style="background:#000;color:white;border-color:#000">▮</span><span class="app-status-pill">1 CAS Applied</span><span style="font-size:14px;cursor:pointer;color:var(--blue-mid)">👁</span></div></td>
+              <td style="font-size:12px">sim****@gmail.com<br>+91 95*****90</td>
+              <td style="font-size:12px">MAXWORTH</td>
+              <td style="font-size:12px">India / Punjab / S</td>
+            </tr>
+            <tr>
+              <td><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px">00918568</span></td>
+              <td><b>Jashan</b></td>
+              <td><span class="profile-status ps-verified-uncond">🇨🇦 Verified (Unconditional)</span></td>
+              <td><div class="app-status-bar"><span class="flag-chip">🇨🇦</span><span class="app-status-pill">1 Offer Approved</span><span style="font-size:14px;cursor:pointer;color:var(--blue-mid)">👁</span></div></td>
+              <td style="font-size:12px">shi****@gmail.com<br>+91 70*****54</td>
+              <td style="font-size:12px">Rajveer Chahal Education Consultant</td>
+              <td style="font-size:12px">— / — / —</td>
+            </tr>
+            <tr>
+              <td><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px">00917801</span></td>
+              <td><b>Shainaz</b></td>
+              <td><span class="profile-status ps-verified-cond">🇬🇧 Verified (Conditional-Academic)</span></td>
+              <td><div class="app-status-bar"><span class="flag-chip">🇬🇧</span><span class="app-status-pill">2 Offer Approved</span><span style="font-size:14px;cursor:pointer;color:var(--blue-mid)">👁</span></div></td>
+              <td style="font-size:12px">sha****@gmail.com<br>+91 78*****52</td>
+              <td style="font-size:12px">Visa Routes</td>
+              <td style="font-size:12px">India / Punjab / I</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:12px;color:var(--text-muted)">Viewing 1 to 20 of 1,248 items</div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:12px;color:var(--text-muted)">Page:</span>
+          <select class="form-input btn-sm" style="width:60px;padding:4px 8px">
+            <option>20</option><option>50</option><option>100</option>
+          </select>
+          <button class="btn btn-ghost btn-sm">‹</button>
+          <button class="btn btn-ghost btn-sm">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMISSION TAB -->
+  <div id="kapply-commission" style="display:none">
+    <div style="margin-bottom:6px"><h2 style="font-family:'Sora',sans-serif;font-size:16px;font-weight:700">Claim Commission</h2><p style="font-size:12.5px;color:var(--text-muted)">Track, manage, and claim your commissions</p></div>
+    <div class="claim-hero">
+      <div class="claim-card primary"><div class="claim-label">Claimable Balance</div><div class="claim-val">₹0</div><div class="claim-sub">Updated this month</div></div>
+      <div class="claim-card"><div class="claim-label" style="color:var(--text-muted)">Invoice Generated</div><div class="claim-val" style="font-family:'Sora',sans-serif;font-size:26px;font-weight:700">₹0</div><div class="claim-sub" style="color:var(--gold);font-size:12px;font-weight:600">All clear</div></div>
+      <div class="claim-card"><div class="claim-label" style="color:var(--text-muted)">Total Claimed</div><div class="claim-val" style="font-family:'Sora',sans-serif;font-size:26px;font-weight:700">₹0</div><div class="claim-sub" style="color:var(--text-muted);font-size:12px">Last claim 0 days ago</div></div>
+    </div>
+    <div class="filter-bar">
+      <div class="filter-row" style="grid-template-columns:repeat(5,1fr)">
+        <div class="form-group" style="margin-bottom:0"><label class="form-label">Agent Name</label><select class="form-input"><option>All Accounts</option></select></div>
+        <div class="form-group" style="margin-bottom:0"><label class="form-label">Institute</label><select class="form-input"><option>Select Institute</option></select></div>
+        <div class="form-group" style="margin-bottom:0"><label class="form-label">Commission Status</label><select class="form-input"><option>Ready Claim</option><option>Claimed</option><option>Pending</option></select></div>
+        <div class="form-group" style="margin-bottom:0"><label class="form-label">Intake</label><select class="form-input"><option>Select Intake</option></select></div>
+        <div class="form-group" style="margin-bottom:0"><label class="form-label">Terms</label><select class="form-input"><option>Select Term</option></select></div>
+      </div>
+      <div class="filter-actions"><button class="btn btn-ghost btn-sm">Reset</button><button class="btn btn-primary btn-sm">Apply Filter</button></div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table><thead><tr><th>Student Name</th><th>Institution</th><th>Program</th><th>College Student ID</th><th>Term 1 Status</th><th>Term 2 Status</th><th>Term 3 Status</th><th>Agent Name</th><th>Country</th><th>Intake</th></tr></thead>
+          <tbody><tr><td colspan="10"><div class="empty-state"><div class="es-icon">🔍</div><p>No commission records found matching the selected filters.</p></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTNER / COMPANY PROFILE TAB -->
+  <div id="kapply-company" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:12px;color:var(--text-muted)"><span style="cursor:pointer;color:var(--blue-mid)">‹ Company Profile</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div><span style="font-size:12px;color:var(--text-muted)">Account Name : </span><span style="font-size:13.5px;font-weight:700">Test Account 5</span></div>
+      <button class="btn btn-outline btn-sm">📅 Update Status</button>
+    </div>
+    <div class="cp-tab-bar">
+      <button class="cp-tab active">» Company Profile</button>
+      <button class="cp-tab">Business Operations</button>
+      <button class="cp-tab">Compliance & Documents</button>
+      <button class="cp-tab">Partnership Details</button>
+      <button class="cp-tab">Collaboration & Strategy</button>
+      <button class="cp-tab">Team Members</button>
+      <button class="cp-tab">Discussion</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Company Profile</span><button class="btn btn-outline btn-sm">✏️ Edit</button></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Company Logo</div><div style="width:60px;height:60px;border-radius:10px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:22px">🏢</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Name of the Organisation</div><div style="font-size:13.5px;color:var(--blue-mid);font-weight:500">Test Account 5</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Organisation Type</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Establishment Year</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Company Registered Under</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Office Space</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Landline Number</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Office Address</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Country</div><div style="font-size:13px;color:var(--blue-mid);font-weight:500">India</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">State</div><div style="font-size:13px;color:var(--blue-mid);font-weight:500">Gujarat</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">City</div><div style="font-size:13px;color:var(--blue-mid);font-weight:500">Vadodara</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Pincode</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Brand Name</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Website Address</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Google Business Page (GMB)</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Instagram Page Link</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+          <div><div style="font-size:11.5px;color:var(--text-muted);margin-bottom:6px">Facebook Page Link</div><div style="font-size:13px;color:var(--text-muted)">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESCALATION TAB -->
+  <div id="kapply-escalation" style="display:none">
+    <div class="page-header" style="margin-bottom:14px">
+      <div class="page-header-left"><h1 style="font-size:18px">📞 Escalation Points — Relationship Manager Contacts</h1><p>All assigned contacts across 4 priority levels for B2B partners</p></div>
+    </div>
+    <div style="display:grid;grid-template-columns:480px 1fr;gap:16px">
+      <div class="rm-panel">
+        <div class="rm-panel-header">
+          <div class="rm-panel-icon">👥</div>
+          <div><div style="font-weight:700;font-size:14px">Relationship Manager Contacts</div><div style="font-size:12px;color:var(--text-muted)">All assigned contacts across 4 priority levels.</div></div>
+          <button style="margin-left:auto;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted)">✕</button>
+        </div>
+        <div class="rm-contact-tabs">
+          <div class="rm-ctab active"><div class="dot"></div> 1st Contact <span style="background:var(--blue-pale);color:var(--blue-mid);border-radius:20px;padding:1px 6px;font-size:10.5px;font-weight:700;margin-left:4px">1</span></div>
+          <div class="rm-ctab"><div class="dot"></div> 2nd Contact <span style="background:var(--surface);border-radius:20px;padding:1px 6px;font-size:10.5px;margin-left:4px">1</span></div>
+          <div class="rm-ctab"><div class="dot"></div> 3rd Contact <span style="background:var(--surface);border-radius:20px;padding:1px 6px;font-size:10.5px;margin-left:4px">1</span></div>
+          <div class="rm-ctab"><div class="dot"></div> 4th Contact <span style="background:var(--surface);border-radius:20px;padding:1px 6px;font-size:10.5px;margin-left:4px">1</span></div>
+        </div>
+        <div class="rm-contact-card">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#F07B30);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:white;flex-shrink:0">CP</div>
+            <div>
+              <div class="rm-contact-name">Chirag Parmar</div>
+              <div class="rm-contact-role">Department Head - B2B Partnership and Support</div>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <div class="rm-contact-detail"><span style="font-size:14px">✉️</span> <span style="color:var(--blue-mid)">chirag@kanan360.com</span></div>
+            <div class="rm-contact-detail"><span style="font-size:14px">📞</span> <span style="color:var(--blue-mid)">9979509988</span></div>
+          </div>
+          <div class="rm-contact-actions">
+            <div class="rm-action-btn rm-wa">💬 WhatsApp</div>
+            <div class="rm-action-btn rm-meet">📹 Meeting</div>
+          </div>
+        </div>
+        <div class="rm-footer">⏱ Click WhatsApp or Meeting links to connect instantly.</div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header"><span class="card-title">📊 Partner Escalation Matrix</span></div>
+          <div class="card-body" style="padding:0">
+            <table><thead><tr><th>Priority</th><th>Contact Person</th><th>Role</th><th>Response SLA</th><th>Channel</th></tr></thead>
+            <tbody>
+              <tr><td><span class="chip red">1st Priority</span></td><td><b>Chirag Parmar</b></td><td>Dept Head - B2B Partnership</td><td>Within 2 hours</td><td>WhatsApp / Call</td></tr>
+              <tr><td><span class="chip gold">2nd Priority</span></td><td><b>Manish Shah</b></td><td>HO Manager</td><td>Within 4 hours</td><td>Email / WhatsApp</td></tr>
+              <tr><td><span class="chip blue">3rd Priority</span></td><td><b>Jitendra Katiya</b></td><td>Operations Head</td><td>Within 8 hours</td><td>Email</td></tr>
+              <tr><td><span class="chip gray">4th Priority</span></td><td><b>Kanan Support</b></td><td>General Support Desk</td><td>Within 24 hours</td><td>Ticket / Email</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- K APPLY REPORTS TAB -->
+  <div id="kapply-kapply-reports" style="display:none">
+    <div class="report-section-title">K Apply Reports</div>
+    <div class="report-section-sub">Insights, Statistics, Performance reports</div>
+    <div class="report-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="report-card"><div class="report-card-title">Status Report</div><div class="report-card-desc">Profile, Applications, Offers, Payments, VISA</div><div class="report-fetch">Fetch →</div></div>
+      <div class="report-card"><div class="report-card-title">Agent Performance Report</div><div class="report-card-desc">Agent wise Profile to Visa status</div><div class="report-fetch">Fetch →</div></div>
+      <div class="report-card"><div class="report-card-title">Application Detail Report</div><div class="report-card-desc">Student Application detailed report</div><div class="report-fetch">Fetch →</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ▸ EVENTS ──────────────────────────────────────── -->
+<div class="page" id="page-events">
+  <div class="page-header">
+    <div class="page-header-left"><h1>🎪 Events</h1><p>Upcoming seminars, fairs, webinars and company events</p></div>
+    <div class="page-header-right"><button class="btn btn-primary">+ Create Event</button></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+    <div class="tab-strip">
+      <button class="tab-btn active" onclick="switchEvtTab(this,'upcoming')">Upcoming</button>
+      <button class="tab-btn" onclick="switchEvtTab(this,'past')">Past</button>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-ghost btn-sm active-year">All</button>
+      <button class="btn btn-ghost btn-sm">2025</button>
+      <button class="btn btn-primary btn-sm">2026</button>
+    </div>
+  </div>
+
+  <div id="events-upcoming">
+    <!-- MAY -->
+    <div class="event-month-section">
+      <div class="event-month-header">
+        <div class="event-month-title">May</div>
+        <div class="event-month-line"></div>
+        <div class="event-month-count">1 event</div>
+      </div>
+      <div style="max-width:380px">
+        <div class="event-card">
+          <div><span class="event-type-badge evt-summit">Summit</span></div>
+          <div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px">AEC TalentMAX Summit 2026</div>
+          <div style="font-size:12.5px;color:var(--text-mid);line-height:1.5;margin-bottom:8px">PSMJ's flagship talent and HR conference for AEC firms. Sessions on recruiting in a tight labor market, compensation benchmarking, succession planning…</div>
+          <div class="event-meta">📅 May 27, 2026 – May 29, 2026</div>
+          <div class="event-meta">📍 Austin, TX</div>
+          <div class="event-meta">👤 Organized by PSMJ Resources</div>
+          <div class="event-meta" style="color:var(--gold);font-weight:600">🏷 TBD</div>
+          <div class="event-tags"><span class="event-tag">Talent Management</span><span class="event-tag">HR</span><span class="event-tag">Recruiting</span><span class="event-tag">+3 more</span></div>
+          <button class="event-btn">View Event Details ↗</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JUNE -->
+    <div class="event-month-section">
+      <div class="event-month-header">
+        <div class="event-month-title">June</div>
+        <div class="event-month-line"></div>
+        <div class="event-month-count">3 events</div>
+      </div>
+      <div class="event-grid">
+        <div class="event-card">
+          <div><span class="event-type-badge evt-conference">Conference</span><span class="event-type-badge evt-free">FREE</span></div>
+          <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:5px">London Festival of Architecture 2026</div>
+          <div style="font-size:12px;color:var(--text-mid);line-height:1.45;margin-bottom:6px">Europe's largest annual architecture festival. A month of public installations, exhibitions, talks, and walks across London…</div>
+          <div class="event-meta">📅 Jun 1 – Jun 30, 2026</div>
+          <div class="event-meta">📍 London, UK</div>
+          <div class="event-tags"><span class="event-tag">Architecture</span><span class="event-tag">Design</span></div>
+          <button class="event-btn">View Event Details ↗</button>
+        </div>
+        <div class="event-card">
+          <div><span class="event-type-badge evt-conference">Conference</span></div>
+          <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:5px">Canada University Fair — Surat</div>
+          <div style="font-size:12px;color:var(--text-mid);line-height:1.45;margin-bottom:6px">Premier event connecting Indian students with top Canadian universities. Meet admission officers, get scholarships info, and apply on the spot.</div>
+          <div class="event-meta">📅 Jun 14, 2026</div>
+          <div class="event-meta">📍 Le Meridien, Surat</div>
+          <div class="event-meta">👤 Organized by Kanan.co</div>
+          <div class="event-tags"><span class="event-tag">University Fair</span><span class="event-tag">Canada</span><span class="event-tag">Study Abroad</span></div>
+          <button class="event-btn" style="background:var(--green)">Register Now ↗</button>
+        </div>
+        <div class="event-card">
+          <div><span class="event-type-badge evt-workshop">Workshop</span><span class="event-type-badge evt-free">FREE</span></div>
+          <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:5px">IELTS Free Workshop — Surat</div>
+          <div style="font-size:12px;color:var(--text-mid);line-height:1.45;margin-bottom:6px">Free IELTS awareness and practice workshop covering Speaking, Writing, Reading and Listening. Open to all aspiring study abroad candidates.</div>
+          <div class="event-meta">📅 Jun 8, 2026</div>
+          <div class="event-meta">📍 Kanan Office, Surat</div>
+          <div class="event-meta">👤 Organized by Kanan.co Coaching</div>
+          <div class="event-tags"><span class="event-tag">IELTS</span><span class="event-tag">Workshop</span><span class="event-tag">Free</span></div>
+          <button class="event-btn" style="background:var(--green)">Register Now ↗</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JULY -->
+    <div class="event-month-section">
+      <div class="event-month-header">
+        <div class="event-month-title">July</div>
+        <div class="event-month-line"></div>
+        <div class="event-month-count">2 events</div>
+      </div>
+      <div class="event-grid">
+        <div class="event-card">
+          <div><span class="event-type-badge evt-webinar">Webinar</span><span class="event-type-badge evt-free">FREE</span></div>
+          <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:5px">Study Abroad Webinar — UK & Ireland 2026</div>
+          <div style="font-size:12px;color:var(--text-mid);line-height:1.45;margin-bottom:6px">Expert-led online session covering top universities, visa process, scholarships and post-study work visas for UK and Ireland.</div>
+          <div class="event-meta">📅 Jul 5, 2026 · 4:00 PM IST</div>
+          <div class="event-meta">💻 Online · Zoom</div>
+          <div class="event-tags"><span class="event-tag">Webinar</span><span class="event-tag">UK</span><span class="event-tag">Ireland</span></div>
+          <button class="event-btn">Register & Join ↗</button>
+        </div>
+        <div class="event-card">
+          <div><span class="event-type-badge evt-fair">University Fair</span></div>
+          <div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:5px">Australia & NZ Education Fair</div>
+          <div style="font-size:12px;color:var(--text-mid);line-height:1.45;margin-bottom:6px">Connect with representatives from top Australian and New Zealand universities. Intake Sep 2026 and Feb 2027 guidance available.</div>
+          <div class="event-meta">📅 Jul 19, 2026</div>
+          <div class="event-meta">📍 Kanan Ahmedabad Office</div>
+          <div class="event-tags"><span class="event-tag">Australia</span><span class="event-tag">New Zealand</span><span class="event-tag">Fair</span></div>
+          <button class="event-btn">View Event Details ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="events-past" style="display:none">
+    <div class="event-month-section">
+      <div class="event-month-header"><div class="event-month-title">April 2025</div><div class="event-month-line"></div><div class="event-month-count">2 events</div></div>
+      <div class="event-grid">
+        <div class="event-card" style="opacity:0.75"><div><span class="event-type-badge evt-workshop">Workshop</span></div><div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:5px">SOP — Kanan Student Visa Fair</div><div class="event-meta">📅 Apr 14, 2025</div><div class="event-meta">📍 Surat, Gujarat</div><button class="event-btn" style="background:var(--text-muted)">Event Ended</button></div>
+        <div class="event-card" style="opacity:0.75"><div><span class="event-type-badge evt-webinar">Webinar</span></div><div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:5px">Onshore Training / B2B Agent Meet</div><div class="event-meta">📅 Apr 3, 2025</div><div class="event-meta">📍 Online</div><button class="event-btn" style="background:var(--text-muted)">Event Ended</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▸ KNOWLEDGEBASE ──────────────────────────────────────── -->
+<div class="page" id="page-kb">
+  <div class="page-header">
+    <div class="page-header-left"><h1>📚 Knowledge Base</h1><p>Important information, folders, documents and training resources</p></div>
+    <div class="page-header-right">
+      <div style="position:relative"><input type="text" class="form-input btn-sm" style="width:200px;padding-left:30px" placeholder="Search…"><span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text-muted)">🔍</span></div>
+      <button class="btn btn-ghost btn-sm">📁 Move Folder</button>
+      <button class="btn btn-primary">+ Add Folder</button>
+      <button class="btn btn-ghost btn-sm">⇅</button>
+    </div>
+  </div>
+  <div style="font-size:12px;font-weight:700;color:var(--blue-mid);margin-bottom:14px;letter-spacing:0.04em">ALL FOLDERS</div>
+  <div class="kb-grid">
+    <div class="kb-folder"><div class="kb-pin pinned">📌</div><input type="checkbox" class="kb-checkbox"><div class="kb-folder-icon">🇦🇪</div><div class="kb-folder-name">|| Study In DUBAI ||</div><div class="kb-folder-count">6 documents</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder"><div class="kb-pin">📌</div><input type="checkbox" class="kb-checkbox"><div class="kb-folder-icon">📁</div><div class="kb-folder-name">Agent Invoice Format</div><div class="kb-folder-count">3 documents</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder"><div class="kb-pin">📌</div><input type="checkbox" class="kb-checkbox"><div class="kb-folder-icon">📁</div><div class="kb-folder-name">B2B White Label Brochures</div><div class="kb-folder-count">12 documents</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder"><div class="kb-pin">📌</div><input type="checkbox" class="kb-checkbox"><div class="kb-folder-icon">📁</div><div class="kb-folder-name">B2C</div><div class="kb-folder-count">8 documents</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder"><div class="kb-pin pinned">📌</div><input type="checkbox" class="kb-checkbox"><div class="kb-folder-icon">🇨🇦</div><div class="kb-folder-name">CANADA KNOW HOW</div><div class="kb-folder-count">18 documents</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder"><div class="kb-pin">📌</div><input type="checkbox" class="kb-checkbox"><div class="kb-folder-icon">📁</div><div class="kb-folder-name">Canada Post Payment</div><div class="kb-folder-count">4 documents</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder"><div class="kb-pin pinned">📌</div><input type="checkbox" class="kb-checkbox"><div style="font-size:18px;margin-bottom:8px;display:flex;align-items:center;gap:8px"><span style="background:var(--red);color:white;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">K</span><span style="font-size:14px">Kanan Pro</span></div><div class="kb-folder-name">Coaching & Training</div><div class="kb-folder-count">24 documents</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder"><div class="kb-pin">📌</div><input type="checkbox" class="kb-checkbox"><div class="kb-folder-icon">📁</div><div class="kb-folder-name">Fixed Training Calendar</div><div class="kb-folder-count">7 documents</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder"><div class="kb-pin">📌</div><input type="checkbox" class="kb-checkbox"><div class="kb-folder-icon">📁</div><div class="kb-folder-name">Franchise</div><div class="kb-folder-count">5 documents</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder"><div class="kb-pin">📌</div><input type="checkbox" class="kb-checkbox"><div class="kb-folder-icon">📁</div><div class="kb-folder-name">How To Claim Commission…</div><div class="kb-folder-count">3 documents</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder"><div class="kb-pin pinned">📌</div><input type="checkbox" class="kb-checkbox"><div class="kb-folder-icon">🎬</div><div class="kb-folder-name">K APPLY PRODUCT VIDEO</div><div class="kb-folder-count">9 videos</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder"><div class="kb-pin">📌</div><input type="checkbox" class="kb-checkbox"><div class="kb-folder-icon">📁</div><div class="kb-folder-name">SOP And Policy For Emplo…</div><div class="kb-folder-count">11 documents</div><div class="kb-folder-actions"><button class="kb-action-btn">✏️</button><button class="kb-action-btn">🗑</button><span class="kb-navigate">→</span></div></div>
+    <div class="kb-folder" style="border:2px dashed var(--border);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:130px;cursor:pointer" onclick="alert('Add New Folder')"><div style="font-size:28px;margin-bottom:8px;color:var(--text-muted)">+</div><div style="font-size:12.5px;color:var(--text-muted);font-weight:500">Add New Folder</div></div>
+  </div>
+</div>
+
+<!-- ▸ MY TASKS ──────────────────────────────────────── -->
+<div class="page" id="page-tasks">
+  <div class="page-header">
+    <div class="page-header-left"><h1>✅ Task Manager</h1><p>Groups, tasks and project tracking</p></div>
+    <div class="page-header-right">
+      <div class="task-header-tabs">
+        <div class="task-view-tab active" onclick="switchTaskView(this,'groups')">🗂 Groups</div>
+        <div class="task-view-tab" onclick="switchTaskView(this,'my-tasks')">✅ My Tasks</div>
+        <div class="task-view-tab" onclick="switchTaskView(this,'reports')">📊 Reports</div>
+        <div class="task-view-tab" onclick="switchTaskView(this,'calendar')">📅 Calendar</div>
+      </div>
+      <button class="btn btn-primary">+ Group</button>
+    </div>
+  </div>
+
+  <!-- GROUPS VIEW -->
+  <div id="task-groups">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <input type="text" class="form-input" style="width:220px" placeholder="Search Group Name">
+      <div style="display:flex;align-items:center;gap:6px"><span style="font-size:12.5px;color:var(--text-muted)">Sort by:</span><select class="form-input btn-sm" style="width:100px"><option>All</option><option>A-Z</option><option>Newest</option></select></div>
+    </div>
+    <div class="task-group-grid">
+      <div class="task-group-card">
+        <div class="tgc-name">Team: N - 4</div>
+        <div class="tgc-desc">B2B - NORTH ZONE RM AND TEAM - N - 4…</div>
+        <div class="tgc-meta">Group Head : <span>Hardik MRM, Chirag Parmar, Jitendra Katiya</span></div>
+        <div class="tgc-meta">Created On : <span>Mon Dec 23 2024</span></div>
+        <div class="tgc-meta">Owner : <span>Happy MRM</span></div>
+        <div class="tgc-stats">View Stats</div>
+        <div class="tgc-members">
+          <div class="tgc-avatar" style="background:#4A72CE">HM</div>
+          <div class="tgc-avatar" style="background:#27944A">JK</div>
+          <div class="tgc-avatar" style="background:var(--gold)">HS</div>
+          <div class="tgc-more">+2</div>
+          <div style="margin-left:auto"><button style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);background:white;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--blue-mid)">+</button></div>
+        </div>
+      </div>
+      <div class="task-group-card">
+        <div class="tgc-name">Team: W - 1</div>
+        <div class="tgc-desc">B2B - WEST ZONE RM AND TEAM - W - 1…</div>
+        <div class="tgc-meta">Group Head : <span>Mukesh MRM, Chirag Parmar, Jitendra Katiya</span></div>
+        <div class="tgc-meta">Created On : <span>Mon Dec 23 2024</span></div>
+        <div class="tgc-meta">Owner : <span>Mukesh MRM</span></div>
+        <div class="tgc-stats">View Stats</div>
+        <div class="tgc-members">
+          <div class="tgc-avatar" style="background:#7C5CBF">AP</div>
+          <div class="tgc-avatar" style="background:#E03B3B">NJ</div>
+          <div class="tgc-avatar" style="background:#27944A">JK</div>
+          <div class="tgc-more">+1</div>
+          <div style="margin-left:auto"><button style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);background:white;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--blue-mid)">+</button></div>
+        </div>
+      </div>
+      <div class="task-group-card">
+        <div class="tgc-name">Team: S1 & S2</div>
+        <div class="tgc-desc">B2B - SOTH ZONE RM AND TEAM - S - 1…</div>
+        <div class="tgc-meta">Group Head : <span>Chirag Parmar, Mukesh MRM, Jitendra Katiya</span></div>
+        <div class="tgc-meta">Created On : <span>Mon Dec 23 2024</span></div>
+        <div class="tgc-meta">Owner : <span>Mukesh MRM</span></div>
+        <div class="tgc-stats">View Stats</div>
+        <div class="tgc-members">
+          <div class="tgc-avatar" style="background:#4A72CE">DM</div>
+          <div class="tgc-avatar" style="background:var(--gold)">DM</div>
+          <div class="tgc-avatar" style="background:#E03B3B">KK</div>
+          <div class="tgc-more">+1</div>
+        </div>
+      </div>
+      <div class="task-group-card">
+        <div class="tgc-name">FEES TEAM</div>
+        <div class="tgc-desc">B2B - FEES TEAM MEMBERS…</div>
+        <div class="tgc-meta">Group Head : <span>Chirag Parmar, Jitendra Katiya</span></div>
+        <div class="tgc-meta">Created On : <span>Fri Dec 13 2024</span></div>
+        <div class="tgc-meta">Owner : <span>Yogesh Zala (YZ)</span></div>
+        <div class="tgc-stats">View Stats</div>
+        <div class="tgc-members">
+          <div class="tgc-avatar" style="background:#27944A">SM</div>
+          <div class="tgc-avatar" style="background:#7C5CBF">JK</div>
+          <div class="tgc-avatar" style="background:var(--gold)">VT</div>
+          <div class="tgc-more">+3</div>
+        </div>
+      </div>
+      <div class="task-group-card">
+        <div class="tgc-name">Application Processing Team Canada (B2B)</div>
+        <div class="tgc-desc">Application Processing Team Canada Members…</div>
+        <div class="tgc-meta">Group Head : <span>Jitendra Katiya</span></div>
+        <div class="tgc-meta">Created On : <span>Sat Dec 28 2024</span></div>
+        <div class="tgc-meta">Owner : <span>Yogesh Zala (YZ)</span></div>
+        <div class="tgc-stats">View Stats</div>
+        <div class="tgc-members">
+          <div class="tgc-avatar" style="background:#4A72CE">MR</div>
+          <div class="tgc-avatar" style="background:#E03B3B">MR</div>
+          <div class="tgc-avatar" style="background:var(--gold)">VR</div>
+          <div class="tgc-more">+5</div>
+        </div>
+      </div>
+      <div class="task-group-card">
+        <div class="tgc-name">K Finder Data Entry Team</div>
+        <div class="tgc-desc">K Finder Data Entry Team…</div>
+        <div class="tgc-meta">Group Head : <span>Chirag Parmar, Jitendra Katiya</span></div>
+        <div class="tgc-meta">Created On : <span>Fri Apr 18 2025</span></div>
+        <div class="tgc-meta">Owner : <span>Mukesh MRM</span></div>
+        <div class="tgc-stats">View Stats</div>
+        <div class="tgc-members">
+          <div class="tgc-avatar" style="background:#4A72CE">NJ</div>
+          <div class="tgc-avatar" style="background:#27944A">BC</div>
+        </div>
+      </div>
+      <div class="task-group-card">
+        <div class="tgc-name">Team: N - 3</div>
+        <div class="tgc-desc">B2B - NORTH ZONE RM AND TEAM - N - 3…</div>
+        <div class="tgc-meta">Group Head : <span>Hardik MRM, Chirag Parmar, Jitendra Katiya</span></div>
+        <div class="tgc-meta">Created On : <span>Mon Dec 23 2024</span></div>
+        <div class="tgc-meta">Owner : <span>Ketan Bagle</span></div>
+        <div class="tgc-stats">View Stats</div>
+        <div class="tgc-members"><div class="tgc-avatar" style="background:#4A72CE">KB</div><div class="tgc-avatar" style="background:var(--gold)">PP</div></div>
+      </div>
+      <div class="task-group-card">
+        <div class="tgc-name">Team: N - 2</div>
+        <div class="tgc-desc">B2B - NORTH ZONE RM AND TEAM - N - 2…</div>
+        <div class="tgc-meta">Group Head : <span>Chirag Parmar, Hardik MRM, Jitendra Katiya</span></div>
+        <div class="tgc-meta">Created On : <span>Mon Dec 23 2024</span></div>
+        <div class="tgc-meta">Owner : <span>Harsh MRM</span></div>
+        <div class="tgc-stats">View Stats</div>
+        <div class="tgc-members"><div class="tgc-avatar" style="background:#7C5CBF">HV</div><div class="tgc-avatar" style="background:var(--green)">BP</div></div>
+      </div>
+      <div class="task-group-card">
+        <div class="tgc-name">Team: N - 1</div>
+        <div class="tgc-desc">B2B - NORTH ZONE RM AND TEAM - N - 1…</div>
+        <div class="tgc-meta">Group Head : <span>Chirag Parmar, Hardik MRM, Jitendra Katiya</span></div>
+        <div class="tgc-meta">Created On : <span>Mon Dec 23 2024</span></div>
+        <div class="tgc-meta">Owner : <span>Hardik MRM</span></div>
+        <div class="tgc-stats">View Stats</div>
+        <div class="tgc-members"><div class="tgc-avatar" style="background:var(--gold)">HM</div><div class="tgc-avatar" style="background:#E03B3B">RK</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY TASKS VIEW -->
+  <div id="task-my-tasks" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <div class="tab-strip"><button class="tab-btn active">All (8)</button><button class="tab-btn">Pending (5)</button><button class="tab-btn">In Progress (2)</button><button class="tab-btn">Done (1)</button><button class="tab-btn">Overdue (1)</button></div>
+      <button class="btn btn-primary btn-sm" style="margin-left:auto">+ Add Task</button>
+    </div>
+    <div class="card"><div class="card-body" style="padding-top:6px;padding-bottom:6px">
+      <div class="task-item"><div class="task-check" onclick="toggleTask(this)"></div><div class="task-text">Follow up with Priya Mehta – visa docs pending</div><div style="margin-right:10px"><span class="chip red">High</span></div><div class="task-due overdue">Overdue</div></div>
+      <div class="task-item"><div class="task-check" onclick="toggleTask(this)"></div><div class="task-text">Update Q2 lead report for Surat branch</div><div style="margin-right:10px"><span class="chip gold">Medium</span></div><div class="task-due">Today</div></div>
+      <div class="task-item"><div class="task-check" onclick="toggleTask(this)"></div><div class="task-text">Call 3 cold leads from CRM pipeline</div><div style="margin-right:10px"><span class="chip blue">Normal</span></div><div class="task-due">Today</div></div>
+      <div class="task-item"><div class="task-check" onclick="toggleTask(this)"></div><div class="task-text">Review SOPs for K Apply agent guide</div><div style="margin-right:10px"><span class="chip blue">Normal</span></div><div class="task-due">May 15</div></div>
+      <div class="task-item"><div class="task-check" onclick="toggleTask(this)"></div><div class="task-text">Prepare MOM for weekly sync meeting</div><div style="margin-right:10px"><span class="chip blue">Normal</span></div><div class="task-due">May 16</div></div>
+      <div class="task-item"><div class="task-check done" onclick="toggleTask(this)">✓</div><div class="task-text done">Send IELTS batch schedule to trainer</div><div style="margin-right:10px"><span class="chip green">Done</span></div><div class="task-due">Done</div></div>
+    </div></div>
+  </div>
+
+  <!-- CALENDAR VIEW -->
+  <div id="task-calendar" style="display:none"><div class="card"><div class="card-body"><div class="empty-state"><div class="es-icon">📅</div><p>Calendar view coming soon — view tasks by date and deadline.</p></div></div></div></div>
+  <div id="task-reports" style="display:none"><div class="card"><div class="card-body"><div class="empty-state"><div class="es-icon">📊</div><p>Task reports and analytics — completion rates, overdue trends and team productivity.</p></div></div></div></div>
+</div>
+
+<!-- ▸ MOM ──────────────────────────────────────── -->
+<div class="page" id="page-mom">
+  <div class="page-header">
+    <div class="page-header-left"><h1>📝 Minutes of Meetings (MOM)</h1><p>Log, track and share all meeting minutes and action items</p></div>
+    <div class="page-header-right"><button class="btn btn-primary">+ Add MoM</button></div>
+  </div>
+  <div class="mom-filter">
+    <div class="mom-filter-grid">
+      <div><label class="form-label">Meeting Title</label><input type="text" class="form-input" placeholder="Example: SOP Meeting"></div>
+      <div><label class="form-label">Meeting Date From</label><input type="date" class="form-input"></div>
+      <div><label class="form-label">Meeting Date To</label><input type="date" class="form-input"></div>
+      <div><label class="form-label">Meeting Category</label><select class="form-input"><option>All</option><option>Meeting</option><option>HOD Meeting</option><option>Team Meeting</option></select></div>
+      <div><label class="form-label">Meeting KRA</label><select class="form-input"><option>All</option><option>Team Performance</option><option>With Management</option><option>Software Update</option></select></div>
+    </div>
+    <div class="mom-filter-grid2">
+      <div><label class="form-label">Status</label><select class="form-input"><option>All</option><option>Approved</option><option>Not Approved</option><option>Draft</option></select></div>
+      <div><label class="form-label">Group</label><select class="form-input"><option>All</option><option>B2B Partners</option><option>MIS Department</option><option>UK B2B Team</option></select></div>
+      <div><label class="form-label">Conducted By</label><select class="form-input"><option>All</option><option>Chirag Parmar</option><option>Manish Shah (HO)</option><option>Sachin More</option></select></div>
+      <div><label class="form-label">Attendees</label><select class="form-input"><option>All</option><option>Chirag Parmar</option><option>Brijesh Patel</option><option>Kunal Mehta</option></select></div>
+    </div>
+    <div class="filter-actions"><button class="btn btn-ghost btn-sm">Reset</button><button class="btn btn-primary btn-sm">Filter</button></div>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:32px"></th><th>Meeting Title</th><th>Meeting Category</th><th>Meeting KRA</th><th>Groups</th><th>Conducted By</th><th>Prepared By</th><th>Approved By</th><th>Agenda</th><th>Attendees</th><th>Meeting Date</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>📎</td><td><span class="td-link">Team N2 - Review Meeting with Manish Si…</span></td><td>Meeting</td><td>Team Performrmac…</td><td><span style="color:var(--green);font-weight:600;font-size:12px">Team: N - 2, +3</span></td><td>Harsh Vadgama</td><td>Brijesh Patel</td><td>Harsh Vadgama</td><td><span class="td-link">View</span></td><td><span style="color:var(--green);font-weight:600;font-size:12px">Brijesh Patel, +7</span></td><td style="white-space:nowrap;color:var(--blue-mid);font-weight:600">24-Feb-2026</td><td><span class="chip gray">Not Started</span></td></tr>
+          <tr><td>📎</td><td><span class="td-link">Kanan EduCon Mail - Pre Traveling Discus…</span></td><td>Meeting</td><td>With Management</td><td><span style="color:var(--green);font-weight:600;font-size:12px">Team: W - 1, +5</span></td><td>Manish Shah (HO)</td><td>Soham MRM</td><td>—</td><td>—</td><td><span style="color:var(--green);font-weight:600;font-size:12px">Chirag Parmar, …</span></td><td style="white-space:nowrap;color:var(--blue-mid);font-weight:600">4-Nov-2025</td><td><span class="chip gold">Not App…</span></td></tr>
+          <tr><td>📎</td><td><span class="td-link">Minutes of Meeting (MOM) - Agent Networ…</span></td><td>Meeting</td><td>Team Meeting</td><td><span style="color:var(--green);font-weight:600;font-size:12px">B2B Partners…</span></td><td>Manish Shah (HO)</td><td>Chirag Parmar</td><td>—</td><td>—</td><td><span style="color:var(--green);font-weight:600;font-size:12px">Chirag Parmar</span></td><td style="white-space:nowrap;color:var(--blue-mid);font-weight:600">4-Nov-2025</td><td><span class="chip gray">Not Started</span></td></tr>
+          <tr><td>📎</td><td><span class="td-link">SOP - Kanan Student Visa Fair</span></td><td>Meeting</td><td>Meeting With HOD/…</td><td><span style="color:var(--green);font-weight:600;font-size:12px">UK B2B Team…</span></td><td>Manish Shah (HO)</td><td>Rajeev Kumar</td><td>—</td><td>—</td><td><span style="color:var(--green);font-weight:600;font-size:12px">Anil Goyal (HOD)…</span></td><td style="white-space:nowrap;color:var(--blue-mid);font-weight:600">14-Jul-2025</td><td><span class="chip gray">Not Started</span></td></tr>
+          <tr><td>📎</td><td><span class="td-link">onshore Training / 3 oct 2025</span></td><td>Meeting</td><td>Team Meeting</td><td><span style="color:var(--green);font-weight:600;font-size:12px">B2B Partners…</span></td><td>Chirag Parmar</td><td>Chirag Parmar</td><td>—</td><td>—</td><td><span style="color:var(--green);font-weight:600;font-size:12px">Chirag Parmar</span></td><td style="white-space:nowrap;color:var(--blue-mid);font-weight:600">3-Oct-2025</td><td><span class="chip gold">Not App…</span></td></tr>
+          <tr><td>📎</td><td><span class="td-link">K Apply VAS module staging demo/discus</span></td><td>Meeting</td><td>Software Update</td><td><span style="color:var(--green);font-weight:600;font-size:12px">MIS Departm…</span></td><td>Sachin More</td><td>Sachin More</td><td>—</td><td>—</td><td><span style="color:var(--green);font-weight:600;font-size:12px">Kunal Mehta, +2</span></td><td style="white-space:nowrap;color:var(--blue-mid);font-weight:600">30-Sep-2025</td><td><span class="chip gray">Not Started</span></td></tr>
+          <tr><td>📎</td><td><span class="td-link">HOD meeting MOM review</span></td><td>Meeting</td><td>HOD Meeting</td><td><span style="color:var(--green);font-weight:600;font-size:12px">Team: N - 1, +6</span></td><td>Manish Shah (HO)</td><td>Hardik Vadgama</td><td>—</td><td>—</td><td><span style="color:var(--green);font-weight:600;font-size:12px">Happy, +23</span></td><td style="white-space:nowrap;color:var(--blue-mid);font-weight:600">29-Aug-2025</td><td><span class="chip gray">Not Started</span></td></tr>
+          <tr><td>📎</td><td><span class="td-link">Meeting with Chennai Team</span></td><td>Meeting</td><td>Software Requirem…</td><td><span style="color:var(--green);font-weight:600;font-size:12px">MIS Departm…</span></td><td>Chirag Parmar</td><td>Sachin More</td><td>—</td><td><span class="td-link">View</span></td><td><span style="color:var(--green);font-weight:600;font-size:12px">Kunal Mehta, +2</span></td><td style="white-space:nowrap;color:var(--blue-mid);font-weight:600">17-Jul-2025</td><td><span class="chip gray">Not Started</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="padding:10px 14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;color:var(--text-muted)">1 to 10 of 39 records</span>
+      <div style="display:flex;gap:4px"><button class="btn btn-ghost btn-sm">‹</button><button class="btn btn-primary btn-sm">1</button><button class="btn btn-ghost btn-sm">2</button><button class="btn btn-ghost btn-sm">3</button><button class="btn btn-ghost btn-sm">4</button><button class="btn btn-ghost btn-sm">›</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ▸ REPORTS ──────────────────────────────────────── -->
+<div class="page" id="page-reports">
+  <div class="page-header">
+    <div class="page-header-left"><h1>📊 Reports & Performance</h1><p>Insights, Statistics, Performance reports</p></div>
+    <div class="page-header-right">
+      <select class="form-input btn-sm" style="width:130px;padding:6px 12px"><option>May 2025</option><option>April 2025</option><option>Q2 2025</option></select>
+      <button class="btn btn-outline btn-sm">📥 Export</button>
+    </div>
+  </div>
+
+  <!-- Branch Stats -->
+  <div class="grid g-4" style="margin-bottom:20px">
+    <div class="stat-card"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">🎯</div><div class="stat-info"><div class="val">142</div><div class="lbl">Leads (MTD)</div><div class="chg up">↑ 18%</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">✅</div><div class="stat-info"><div class="val">21</div><div class="lbl">Conversions</div><div class="chg up">↑ 5%</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--gold-light);color:var(--gold)">💰</div><div class="stat-info"><div class="val">₹8.4L</div><div class="lbl">Revenue (MTD)</div><div class="chg up">↑ 12%</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--purple-light);color:var(--purple)">📈</div><div class="stat-info"><div class="val">14.8%</div><div class="lbl">Conversion Rate</div><div class="chg up">↑ 2.1%</div></div></div>
+  </div>
+
+  <!-- K Apply Reports section -->
+  <div class="report-section-title">K Apply Reports</div>
+  <div class="report-section-sub">Insights, Statistics, Performance reports</div>
+  <div class="report-grid">
+    <div class="report-card"><div class="report-card-title">📋 Status Report</div><div class="report-card-desc">Profile, Applications, Offers, Payments, VISA</div><div class="report-fetch">Fetch</div></div>
+    <div class="report-card"><div class="report-card-title">📊 Agent Performance Report</div><div class="report-card-desc">Agent wise Profile to Visa status</div><div class="report-fetch">Fetch</div></div>
+    <div class="report-card"><div class="report-card-title">📄 Application Detail Report</div><div class="report-card-desc">Student Application detailed report</div><div class="report-fetch">Fetch</div></div>
+  </div>
+
+  <hr class="section-divider">
+  <div class="report-section-title">Team Reports</div>
+  <div class="report-section-sub">Insights, Statistics, Performance reports</div>
+  <div class="report-grid">
+    <div class="report-card"><div class="report-card-title">🎓 Counsellor Report</div><div class="report-card-desc">Profile, Applications, Offers, Payments, Visa</div><div class="report-fetch">Fetch</div></div>
+    <div class="report-card"><div class="report-card-title">💰 Fees Team Report</div><div class="report-card-desc">Profile, Applications, Offers, Payments, Visa</div><div class="report-fetch">Fetch</div></div>
+    <div class="report-card"><div class="report-card-title">📣 Communication Team Report</div><div class="report-card-desc">Profile, Applications, Offers, Payments, Visa</div><div class="report-fetch">Fetch</div></div>
+    <div class="report-card"><div class="report-card-title">📁 Application Team Report</div><div class="report-card-desc">Profile, Applications, Offers, Payments, Visa</div><div class="report-fetch">Fetch</div></div>
+    <div class="report-card"><div class="report-card-title">🛂 Visa Team Report</div><div class="report-card-desc">Profile, Applications, Offers, Payments, Visa</div><div class="report-fetch">Fetch</div></div>
+  </div>
+
+  <hr class="section-divider">
+  <div class="report-section-title">Branch Performance Reports</div>
+  <div class="report-section-sub">Monthly and quarterly branch-level analytics</div>
+  <div class="report-grid">
+    <div class="report-card"><div class="report-card-title">📊 Lead Report</div><div class="report-card-desc">Total leads, sources, conversion funnel and branch breakdown</div><div class="report-fetch">Fetch</div></div>
+    <div class="report-card"><div class="report-card-title">🏆 Performance Report</div><div class="report-card-desc">Targets vs achieved, KRA scores, employee-wise breakdown</div><div class="report-fetch">Fetch</div></div>
+    <div class="report-card"><div class="report-card-title">📅 Attendance Report</div><div class="report-card-desc">Attendance, WFH, leave utilization and punctuality report</div><div class="report-fetch">Fetch</div></div>
+    <div class="report-card"><div class="report-card-title">🌱 Training Report</div><div class="report-card-desc">Module completion, scores and certification tracking</div><div class="report-fetch">Fetch</div></div>
+  </div>
+</div>
+
+<!-- ▸ TRAINING ──────────────────────────────────────── -->
+<div class="page" id="page-training">
+  <div class="page-header">
+    <div class="page-header-left"><h1>🌱 Training & Development</h1><p>Learning paths, certifications and skill development</p></div>
+    <div class="page-header-right">
+      <div class="tab-strip"><button class="tab-btn active">My Learning</button><button class="tab-btn">All Courses</button><button class="tab-btn">Certifications</button><button class="tab-btn">Calendar</button></div>
+    </div>
+  </div>
+  <div class="grid g-4" style="margin-bottom:18px">
+    <div class="stat-card"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">📚</div><div class="stat-info"><div class="val">4</div><div class="lbl">Courses Enrolled</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">✅</div><div class="stat-info"><div class="val">2</div><div class="lbl">Completed</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--gold-light);color:var(--gold)">🎓</div><div class="stat-info"><div class="val">1</div><div class="lbl">Certifications</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--purple-light);color:var(--purple)">⏱️</div><div class="stat-info"><div class="val">14h</div><div class="lbl">Hours Learned</div></div></div>
+  </div>
+  <div class="grid g-2">
+    <div class="card"><div class="card-header"><span class="card-title">📈 My Learning Progress</span></div>
+      <div class="card-body">
+        <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">IELTS Coaching Certification</span><span class="chip green">Enrolled</span></div>
+          <div class="progress-wrap" style="margin-bottom:0"><div class="progress-label"><span style="font-size:11.5px;color:var(--text-muted)">4 of 5 modules done</span><span>80%</span></div><div class="progress-track"><div class="progress-fill" style="width:80%;background:var(--blue-mid)"></div></div></div>
+          <button class="btn btn-primary btn-sm" style="margin-top:10px">Continue →</button>
+        </div>
+        <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">Study Abroad Counselling</span><span class="chip blue">In Progress</span></div>
+          <div class="progress-wrap" style="margin-bottom:0"><div class="progress-label"><span style="font-size:11.5px;color:var(--text-muted)">3 of 5 modules done</span><span>60%</span></div><div class="progress-track"><div class="progress-fill" style="width:60%;background:var(--green)"></div></div></div>
+          <button class="btn btn-outline btn-sm" style="margin-top:10px">Continue →</button>
+        </div>
+        <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">CRM & Lead Management</span><span class="chip green">Completed ✓</span></div>
+          <div class="progress-wrap" style="margin-bottom:0"><div class="progress-label"><span style="font-size:11.5px;color:var(--text-muted)">All modules complete</span><span>100%</span></div><div class="progress-track"><div class="progress-fill" style="width:100%;background:var(--gold)"></div></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">UK Visa Process Training</span><span class="chip gold">In Progress</span></div>
+          <div class="progress-wrap" style="margin-bottom:0"><div class="progress-label"><span style="font-size:11.5px;color:var(--text-muted)">2 of 4 modules done</span><span>45%</span></div><div class="progress-track"><div class="progress-fill" style="width:45%;background:var(--purple)"></div></div></div>
+          <button class="btn btn-outline btn-sm" style="margin-top:10px">Continue →</button>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card"><div class="card-header"><span class="card-title">📚 Recommended Courses</span><button class="btn btn-outline btn-sm">+ Enroll</button></div>
+        <div class="card-body" style="padding-top:10px">
+          <div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div style="font-size:22px">🇨🇦</div><div style="flex:1"><div style="font-weight:600;font-size:13px">Canada Study Permit 2025</div><div style="font-size:11.5px;color:var(--text-muted)">2.5 hrs · Updated May 2025</div></div><button class="btn btn-primary btn-sm">Start</button></div>
+          <div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div style="font-size:22px">🎯</div><div style="flex:1"><div style="font-weight:600;font-size:13px">Advanced CRM Techniques</div><div style="font-size:11.5px;color:var(--text-muted)">1.5 hrs · Beginner–Advanced</div></div><button class="btn btn-outline btn-sm">Enroll</button></div>
+          <div style="display:flex;gap:12px;align-items:center;padding:10px 0"><div style="font-size:22px">💬</div><div style="flex:1"><div style="font-weight:600;font-size:13px">IELTS Speaking Coaching</div><div style="font-size:11.5px;color:var(--text-muted)">3 hrs · Trainer Certification</div></div><button class="btn btn-outline btn-sm">Enroll</button></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-header"><span class="card-title">🎓 Certificates Earned</span></div>
+        <div class="card-body">
+          <div style="display:flex;gap:12px;align-items:center;background:var(--gold-light);border:1px solid rgba(232,160,32,0.3);border-radius:9px;padding:12px"><div style="font-size:28px">🏅</div><div><div style="font-weight:700;font-size:13px">CRM & Lead Management</div><div style="font-size:11.5px;color:var(--gold);font-weight:600">Certified · April 2025</div></div><button class="btn btn-gold btn-sm" style="margin-left:auto">📥 Download</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ▸ VAS ──────────────────────────────────────── -->
+<div class="page" id="page-vas">
+  <div class="page-header">
+    <div class="page-header-left"><h1>🛎️ VAS — Value Added Services</h1><p>Additional services offered to students and partners</p></div>
+    <div class="page-header-right"><button class="btn btn-primary">+ New Service Request</button></div>
+  </div>
+  <div class="grid g-4" style="margin-bottom:18px">
+    <div class="stat-card"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">📋</div><div class="stat-info"><div class="val">142</div><div class="lbl">Active Requests</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">✅</div><div class="stat-info"><div class="val">89</div><div class="lbl">Completed</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--gold-light);color:var(--gold)">⏳</div><div class="stat-info"><div class="val">38</div><div class="lbl">In Progress</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--red-light);color:var(--red)">🔴</div><div class="stat-info"><div class="val">15</div><div class="lbl">Pending Review</div></div></div>
+  </div>
+  <div style="font-family:'Sora',sans-serif;font-size:13.5px;font-weight:700;margin-bottom:12px">Available Services</div>
+  <div class="grid g-4" style="margin-bottom:20px">
+    <div class="vas-service-card"><div class="vas-icon">💱</div><div class="vas-name">Forex Services</div><div class="vas-desc">Currency exchange and international transfers for students going abroad</div><div class="vas-count">42 active · 3 pending</div><button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center">Manage →</button></div>
+    <div class="vas-service-card"><div class="vas-icon">🛡️</div><div class="vas-name">Travel Insurance</div><div class="vas-desc">Student travel and health insurance for study abroad destinations</div><div class="vas-count">28 active · 5 pending</div><button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center">Manage →</button></div>
+    <div class="vas-service-card"><div class="vas-icon">🏠</div><div class="vas-name">Accommodation</div><div class="vas-desc">Student housing search, booking and pre-arrival support services</div><div class="vas-count">35 active · 4 pending</div><button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center">Manage →</button></div>
+    <div class="vas-service-card"><div class="vas-icon">✈️</div><div class="vas-name">Flight Booking</div><div class="vas-desc">Travel assistance and flight booking for students and accompanying family</div><div class="vas-count">18 active · 2 pending</div><button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center">Manage →</button></div>
+    <div class="vas-service-card"><div class="vas-icon">🎒</div><div class="vas-name">Pre-Departure</div><div class="vas-desc">Pre-departure orientation, checklist and essential services bundle</div><div class="vas-count">12 active · 1 pending</div><button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center">Manage →</button></div>
+    <div class="vas-service-card"><div class="vas-icon">📱</div><div class="vas-name">SIM Card / eSIM</div><div class="vas-desc">International SIM cards and eSIM plans for study abroad destinations</div><div class="vas-count">7 active · 0 pending</div><button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center">Manage →</button></div>
+    <div class="vas-service-card"><div class="vas-icon">🏦</div><div class="vas-name">Bank Account Setup</div><div class="vas-desc">International student bank account opening assistance and guidance</div><div class="vas-count">5 active · 0 pending</div><button class="btn btn-outline btn-sm" style="margin-top:10px;width:100%;justify-content:center">View →</button></div>
+    <div class="vas-service-card" style="border:2px dashed var(--border);background:var(--surface)"><div class="vas-icon" style="color:var(--text-muted)">+</div><div class="vas-name" style="color:var(--text-muted)">Add New Service</div><div class="vas-desc">Configure a new value-added service for students or B2B partners</div><button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%;justify-content:center">Configure</button></div>
+  </div>
+</div>
+
+<!-- ▸ HELP DESK ──────────────────────────────────────── -->
+<div class="page" id="page-helpdesk">
+  <div class="page-header">
+    <div class="page-header-left"><h1>🆘 Support / Help Desk</h1><p>Raise and track IT, HR and Operations support tickets</p></div>
+    <div class="page-header-right"><button class="btn btn-outline btn-sm">📊 Dashboard</button><button class="btn btn-primary">+ Raise Ticket</button></div>
+  </div>
+  <div class="grid g-4" style="margin-bottom:18px">
+    <div class="stat-card"><div class="stat-icon" style="background:var(--red-light);color:var(--red)">🎫</div><div class="stat-info"><div class="val">3</div><div class="lbl">Open Tickets</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--gold-light);color:var(--gold)">⏳</div><div class="stat-info"><div class="val">1</div><div class="lbl">Awaiting Response</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">🔄</div><div class="stat-info"><div class="val">2</div><div class="lbl">In Progress</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">✅</div><div class="stat-info"><div class="val">8</div><div class="lbl">Resolved (Total)</div></div></div>
+  </div>
+  <div class="grid g-2">
+    <div class="card"><div class="card-header"><span class="card-title">🎫 My Tickets</span>
+      <div class="tab-strip" style="margin-bottom:0"><button class="tab-btn active">All</button><button class="tab-btn">Open</button><button class="tab-btn">Resolved</button></div>
+    </div>
+      <div class="card-body" style="padding-top:6px;padding-bottom:6px">
+        <div class="ticket-item"><div class="ticket-num">#TKT-021</div><div class="ticket-main"><div class="ticket-subject">Laptop screen flickering in external display mode</div><div class="ticket-meta">IT Hardware · Raised May 10 · Priority: High</div></div><span class="chip gold">In Progress</span></div>
+        <div class="ticket-item"><div class="ticket-num">#TKT-018</div><div class="ticket-main"><div class="ticket-subject">Attendance correction request — May 2, 2025</div><div class="ticket-meta">HR · Raised May 5 · Priority: Medium</div></div><span class="chip blue">Open</span></div>
+        <div class="ticket-item"><div class="ticket-num">#TKT-011</div><div class="ticket-main"><div class="ticket-subject">CRM access not working on mobile app</div><div class="ticket-meta">IT Software · Raised Apr 28 · Priority: High</div></div><span class="chip green">Resolved</span></div>
+        <div class="ticket-item"><div class="ticket-num">#TKT-009</div><div class="ticket-main"><div class="ticket-subject">Request: Access to Reports module</div><div class="ticket-meta">IT Access · Raised Apr 22 · Priority: Low</div></div><span class="chip green">Resolved</span></div>
+        <div class="ticket-item"><div class="ticket-num">#TKT-004</div><div class="ticket-main"><div class="ticket-subject">Email signature update — official branding</div><div class="ticket-meta">IT · Raised Apr 10 · Priority: Low</div></div><span class="chip green">Resolved</span></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-header"><span class="card-title">✏️ Raise New Ticket</span></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">Category</label><select class="form-input"><option>IT Hardware</option><option>IT Software</option><option>IT Access</option><option>HR</option><option>Finance</option><option>Operations</option><option>Other</option></select></div>
+        <div class="form-group"><label class="form-label">Priority</label><select class="form-input"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+        <div class="form-group"><label class="form-label">Subject</label><input type="text" class="form-input" placeholder="Brief description of the issue"></div>
+        <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" rows="3" placeholder="Provide detailed information about the issue…"></textarea></div>
+        <div class="form-group"><label class="form-label">Attachment (optional)</label><div style="border:2px dashed var(--border);border-radius:8px;padding:16px;text-align:center;cursor:pointer;color:var(--text-muted);font-size:12.5px">📎 Click to attach files or drag and drop here</div></div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center">Submit Ticket</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── REMAINING PAGES (kept concise) ── -->
+<div class="page" id="page-ess"><div class="page-header"><div class="page-header-left"><h1>👤 My Kanan — ESS</h1><p>Employee Self Service Portal</p></div><div class="page-header-right"><button class="btn btn-primary">+ New Request</button></div></div><div class="grid g-3" style="margin-bottom:18px"><div class="stat-card"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">💰</div><div class="stat-info"><div class="val">₹58,400</div><div class="lbl">Monthly CTC</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">📅</div><div class="stat-info"><div class="val">36</div><div class="lbl">Days at Kanan</div><div class="chg up">Joined Apr 2025</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--gold-light);color:var(--gold)">🎖️</div><div class="stat-info"><div class="val">4</div><div class="lbl">Badges Earned</div></div></div></div><div class="grid g-2"><div class="card"><div class="card-header"><span class="card-title">📋 My Recent Requests</span></div><div class="card-body" style="padding:0"><table><thead><tr><th>Type</th><th>Date</th><th>Status</th></tr></thead><tbody><tr><td>Casual Leave</td><td>May 10–11</td><td><span class="chip green">Approved</span></td></tr><tr><td>WFH Request</td><td>May 8</td><td><span class="chip green">Approved</span></td></tr><tr><td>Certificate Request</td><td>May 5</td><td><span class="chip blue">Processing</span></td></tr><tr><td>Advance Salary</td><td>Apr 28</td><td><span class="chip red">Rejected</span></td></tr></tbody></table></div></div><div class="card"><div class="card-header"><span class="card-title">🔗 ESS Quick Actions</span></div><div class="card-body"><div class="grid g-2" style="gap:9px"><button class="btn btn-outline" style="justify-content:center" onclick="navigate(document.querySelector('[data-page=leave]'),'leave')">🌴 Apply Leave</button><button class="btn btn-outline" style="justify-content:center" onclick="navigate(document.querySelector('[data-page=payroll]'),'payroll')">💰 View Payslip</button><button class="btn btn-outline" style="justify-content:center">📄 Get Certificate</button><button class="btn btn-outline" style="justify-content:center">✏️ Update Info</button><button class="btn btn-outline" style="justify-content:center" onclick="navigate(document.querySelector('[data-page=schedule]'),'schedule')">🕐 Mark Attendance</button><button class="btn btn-outline" style="justify-content:center" onclick="navigate(document.querySelector('[data-page=helpdesk]'),'helpdesk')">🆘 Raise Ticket</button></div></div></div></div></div>
+<div class="page" id="page-payroll"><div class="page-header"><div class="page-header-left"><h1>💰 Payroll & Compensation</h1><p>Payslips, salary breakdowns and tax info</p></div><div class="page-header-right"><button class="btn btn-outline">📄 Download Form 16</button></div></div><div class="grid g-3" style="margin-bottom:18px"><div class="stat-card"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">💵</div><div class="stat-info"><div class="val">₹52,680</div><div class="lbl">Net Take-Home (Apr)</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">📊</div><div class="stat-info"><div class="val">₹58,400</div><div class="lbl">Gross CTC</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--red-light);color:var(--red)">📉</div><div class="stat-info"><div class="val">₹5,720</div><div class="lbl">Total Deductions</div></div></div></div><div class="card"><div class="card-header"><span class="card-title">📄 Payslip History</span></div><div class="card-body" style="padding:0"><table><thead><tr><th>Month</th><th>Gross</th><th>Deductions</th><th>Net Pay</th><th>Status</th><th>Action</th></tr></thead><tbody><tr><td>April 2025</td><td>₹58,400</td><td>₹5,720</td><td>₹52,680</td><td><span class="chip green">Paid</span></td><td><button class="btn btn-outline btn-sm">📥 Download</button></td></tr><tr><td>March 2025</td><td>₹58,400</td><td>₹5,720</td><td>₹52,680</td><td><span class="chip green">Paid</span></td><td><button class="btn btn-outline btn-sm">📥 Download</button></td></tr></tbody></table></div></div></div>
+<div class="page" id="page-leave"><div class="page-header"><div class="page-header-left"><h1>🌴 Leave Management</h1><p>Apply, track and manage leave requests</p></div><div class="page-header-right"><button class="btn btn-primary">+ Apply Leave</button></div></div><div class="grid g-3" style="margin-bottom:18px"><div class="stat-card"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">📆</div><div class="stat-info"><div class="val">8</div><div class="lbl">Casual Leave</div><div class="chg">12 total</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">🩺</div><div class="stat-info"><div class="val">6</div><div class="lbl">Sick Leave</div><div class="chg">8 total</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--gold-light);color:var(--gold)">⏳</div><div class="stat-info"><div class="val">5</div><div class="lbl">Earned Leave</div><div class="chg">15 total</div></div></div></div><div class="grid g-2"><div class="card"><div class="card-header"><span class="card-title">📋 Leave History</span></div><div class="card-body" style="padding:0"><table><thead><tr><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Status</th></tr></thead><tbody><tr><td>Casual</td><td>May 10</td><td>May 11</td><td>2</td><td><span class="chip green">Approved</span></td></tr><tr><td>WFH</td><td>May 8</td><td>May 8</td><td>1</td><td><span class="chip green">Approved</span></td></tr><tr><td>Sick</td><td>Apr 22</td><td>Apr 22</td><td>1</td><td><span class="chip green">Approved</span></td></tr></tbody></table></div></div><div class="card"><div class="card-header"><span class="card-title">📝 Apply New Leave</span></div><div class="card-body"><div class="form-group"><label class="form-label">Leave Type</label><select class="form-input"><option>Casual Leave</option><option>Sick Leave</option><option>Earned Leave</option><option>WFH</option></select></div><div class="grid g-2" style="gap:10px"><div class="form-group"><label class="form-label">From Date</label><input type="date" class="form-input" value="2025-05-20"></div><div class="form-group"><label class="form-label">To Date</label><input type="date" class="form-input" value="2025-05-21"></div></div><div class="form-group"><label class="form-label">Reason</label><textarea class="form-input" rows="3" placeholder="Enter reason…"></textarea></div><button class="btn btn-primary" style="width:100%;justify-content:center">Submit Request</button></div></div></div></div>
+<div class="page" id="page-profile"><div class="page-header"><div class="page-header-left"><h1>🪪 Personal Profile</h1><p>View and manage your employee profile</p></div><div class="page-header-right"><button class="btn btn-primary">✏️ Edit Profile</button></div></div><div class="profile-hero"><div class="profile-avatar">CP</div><div><div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:700;margin-bottom:3px">Chirag Parmar</div><div style="font-size:13px;opacity:0.8;margin-bottom:8px">Business Development Manager · Surat Branch</div><div style="display:flex;gap:7px;flex-wrap:wrap"><span style="background:rgba(255,255,255,0.15);border-radius:20px;padding:3px 11px;font-size:11.5px">Full-Time</span><span style="background:rgba(255,255,255,0.15);border-radius:20px;padding:3px 11px;font-size:11.5px">Surat, Gujarat</span><span style="background:rgba(255,255,255,0.15);border-radius:20px;padding:3px 11px;font-size:11.5px">EMP-0042</span></div></div><div style="margin-left:auto;text-align:right"><div style="font-size:36px;font-weight:800;font-family:Sora,sans-serif">2,840</div><div style="font-size:12px;opacity:0.7">K Points</div><div style="margin-top:6px"><span style="background:rgba(255,255,255,0.2);padding:3px 12px;border-radius:20px;font-size:12px;font-weight:600">Rank #3 🏆</span></div></div></div><div class="grid g-2"><div class="card"><div class="card-header"><span class="card-title">📇 Contact Information</span></div><div class="card-body"><table><tbody><tr><td style="color:var(--text-muted);width:140px;padding:8px 0">Work Email</td><td>chirag@kanan.co</td></tr><tr><td style="color:var(--text-muted);padding:8px 0">Mobile</td><td>+91 98765 43210</td></tr><tr><td style="color:var(--text-muted);padding:8px 0">Location</td><td>Surat, Gujarat</td></tr><tr><td style="color:var(--text-muted);padding:8px 0">Date of Joining</td><td>01 April 2025</td></tr><tr><td style="color:var(--text-muted);padding:8px 0">Reporting To</td><td>Ankit Shah (Branch Head)</td></tr></tbody></table></div></div><div class="card"><div class="card-header"><span class="card-title">🎖️ Badges & Achievements</span></div><div class="card-body"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px"><div style="text-align:center"><div style="font-size:26px">🌟</div><div style="font-size:11px;font-weight:600;margin-top:4px">Star Performer</div></div><div style="text-align:center"><div style="font-size:26px">🚀</div><div style="font-size:11px;font-weight:600;margin-top:4px">Quick Starter</div></div><div style="text-align:center"><div style="font-size:26px">🤝</div><div style="font-size:11px;font-weight:600;margin-top:4px">Team Player</div></div><div style="text-align:center;opacity:0.4"><div style="font-size:26px">🏅</div><div style="font-size:11px;font-weight:600;margin-top:4px">Leader</div></div></div></div></div></div></div>
+<div class="page" id="page-schedule"><div class="page-header"><div class="page-header-left"><h1>🕐 Schedule & Attendance</h1><p>Time tracking, attendance and shift management</p></div><div class="page-header-right"><button class="btn btn-primary">✅ Mark Attendance</button></div></div><div class="grid g-4" style="margin-bottom:18px"><div class="stat-card"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">✅</div><div class="stat-info"><div class="val">21</div><div class="lbl">Present Days</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--red-light);color:var(--red)">❌</div><div class="stat-info"><div class="val">1</div><div class="lbl">Absent Days</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">🏠</div><div class="stat-info"><div class="val">3</div><div class="lbl">WFH Days</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--gold-light);color:var(--gold)">⏱️</div><div class="stat-info"><div class="val">94%</div><div class="lbl">Attendance %</div></div></div></div><div class="card"><div class="card-header"><span class="card-title">📅 May 2025 Attendance Log</span></div><div class="card-body" style="padding:0"><table><thead><tr><th>Date</th><th>Check In</th><th>Check Out</th><th>Hours</th><th>Status</th></tr></thead><tbody><tr><td>May 13 (Wed)</td><td>9:04 AM</td><td>—</td><td>In Progress</td><td><span class="chip green">Present</span></td></tr><tr><td>May 12 (Tue)</td><td>9:15 AM</td><td>6:30 PM</td><td>9h 15m</td><td><span class="chip green">Present</span></td></tr><tr><td>May 9 (Fri)</td><td>9:02 AM</td><td>6:15 PM</td><td>9h 13m</td><td><span class="chip green">Present</span></td></tr><tr><td>May 8 (Thu)</td><td>9:00 AM</td><td>6:00 PM</td><td>9h 00m</td><td><span class="chip blue">WFH</span></td></tr></tbody></table></div></div></div>
+<div class="page" id="page-employees"><div class="page-header"><div class="page-header-left"><h1>👥 All Employee Grid</h1><p>Directory of all Kanan.co team members</p></div></div><div class="card"><div class="card-body" style="padding:0"><table><thead><tr><th>Employee</th><th>Department</th><th>Branch</th><th>Role</th><th>Status</th><th>Contact</th></tr></thead><tbody><tr><td><div style="display:flex;align-items:center;gap:9px"><div class="avatar" style="background:linear-gradient(135deg,#C8960A,#E8A020)">AS</div><div><b>Ankit Shah</b><br><small style="color:var(--text-muted)">EMP-0001</small></div></div></td><td>Management</td><td>Surat</td><td>Branch Head</td><td><span class="chip green">Active</span></td><td>ankit@kanan.co</td></tr><tr><td><div style="display:flex;align-items:center;gap:9px"><div class="avatar" style="background:linear-gradient(135deg,var(--gold),#F07B30)">CP</div><div><b>Chirag Parmar</b><br><small style="color:var(--text-muted)">EMP-0042</small></div></div></td><td>Business Dev.</td><td>Surat</td><td>BDM</td><td><span class="chip green">Active</span></td><td>chirag@kanan.co</td></tr><tr><td><div style="display:flex;align-items:center;gap:9px"><div class="avatar" style="background:linear-gradient(135deg,#6B8BB0,#8BA8CC)">RS</div><div><b>Riya Sharma</b><br><small style="color:var(--text-muted)">EMP-0012</small></div></div></td><td>Counselling</td><td>Surat</td><td>Sr. Counsellor</td><td><span class="chip green">Active</span></td><td>riya@kanan.co</td></tr></tbody></table></div></div></div>
+<div class="page" id="page-policies"><div class="page-header"><div class="page-header-left"><h1>📋 Policies & SOPs</h1><p>Company policies, SOPs and HR guidelines</p></div><div class="page-header-right"><button class="btn btn-primary">+ Upload Document</button></div></div><div class="card"><div class="card-body" style="padding:0"><table><thead><tr><th>Document</th><th>Category</th><th>Updated</th><th>Action</th></tr></thead><tbody><tr><td>📄 Leave Policy 2025</td><td>HR</td><td>Apr 2025</td><td><button class="btn btn-outline btn-sm">View</button></td></tr><tr><td>📄 WFH Guidelines</td><td>HR</td><td>May 2025</td><td><button class="btn btn-outline btn-sm">View</button></td></tr><tr><td>📄 K Apply Agent SOP</td><td>Operations</td><td>Apr 2025</td><td><button class="btn btn-outline btn-sm">View</button></td></tr><tr><td>📄 CRM Usage Guidelines</td><td>Sales</td><td>Mar 2025</td><td><button class="btn btn-outline btn-sm">View</button></td></tr><tr><td>📄 Code of Conduct</td><td>Compliance</td><td>Jan 2025</td><td><button class="btn btn-outline btn-sm">View</button></td></tr></tbody></table></div></div></div>
+<div class="page" id="page-news"><div class="page-header"><div class="page-header-left"><h1>📢 News & Announcements</h1><p>Company updates and team news</p></div><div class="page-header-right"><button class="btn btn-primary">+ Post Announcement</button></div></div><div class="grid g-2"><div style="display:flex;flex-direction:column;gap:14px"><div class="card"><div class="card-body"><div style="display:flex;gap:9px;margin-bottom:8px"><span class="chip blue">Company</span><span style="font-size:11.5px;color:var(--text-muted)">2 hours ago · HR Team</span></div><div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;margin-bottom:7px">Q2 All-Hands Meeting — May 20, 2025 at 4:00 PM</div><p style="font-size:13px;color:var(--text-mid);line-height:1.6">All team members are requested to join the Q2 review session. Agenda includes branch performance, new initiatives and Q3 planning. Zoom link will be shared by EOD.</p></div></div><div class="card"><div class="card-body"><div style="display:flex;gap:9px;margin-bottom:8px"><span class="chip green">Coaching</span><span style="font-size:11.5px;color:var(--text-muted)">Yesterday · Academics Team</span></div><div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;margin-bottom:7px">New IELTS Batch Starting June 1 — Enroll Now</div><p style="font-size:13px;color:var(--text-mid);line-height:1.6">A new IELTS General & Academic batch starts June 1. Seats are limited. Please coordinate with the coaching team to register interested students by May 25.</p></div></div></div><div style="display:flex;flex-direction:column;gap:14px"><div class="card"><div class="card-body"><div style="display:flex;gap:9px;margin-bottom:8px"><span class="chip gold">HR Policy</span><span style="font-size:11.5px;color:var(--text-muted)">2 days ago · HR</span></div><div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;margin-bottom:7px">WFH Policy Revised — Effective June 2025</div><p style="font-size:13px;color:var(--text-mid);line-height:1.6">The work-from-home policy has been updated. Employees may avail up to 4 WFH days per month with prior approval. Please review the updated SOP on the Policies page.</p></div></div><div class="card"><div class="card-body"><div style="display:flex;gap:9px;margin-bottom:8px"><span class="chip purple">Culture</span><span style="font-size:11.5px;color:var(--text-muted)">3 days ago · People Team</span></div><div style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700;margin-bottom:7px">🎉 Employee of the Month — April 2025</div><p style="font-size:13px;color:var(--text-mid);line-height:1.6">Congratulations to <b>Ankit Shah</b> (Surat Branch) for being selected as Employee of the Month for April 2025! Keep up the outstanding work! 🏆</p></div></div></div></div></div>
+<div class="page" id="page-crm"><div class="page-header"><div class="page-header-left"><h1>🎯 CRM — Lead Management</h1><p>Track, nurture and convert leads</p></div><div class="page-header-right"><button class="btn btn-ghost btn-sm">📤 Export</button><button class="btn btn-primary">+ Add Lead</button></div></div><div class="grid g-4" style="margin-bottom:18px"><div class="stat-card"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">👥</div><div class="stat-info"><div class="val">142</div><div class="lbl">Total Leads</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--gold-light);color:var(--gold)">🔥</div><div class="stat-info"><div class="val">38</div><div class="lbl">Hot Leads</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">✅</div><div class="stat-info"><div class="val">21</div><div class="lbl">Converted</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--purple-light);color:var(--purple)">📞</div><div class="stat-info"><div class="val">12</div><div class="lbl">Follow-ups Today</div></div></div></div><div class="card"><div class="card-body" style="padding:0"><table><thead><tr><th>Name</th><th>Source</th><th>Country</th><th>Stage</th><th>Counsellor</th><th>Next Action</th></tr></thead><tbody><tr><td><b>Rohan Desai</b><br><small style="color:var(--text-muted)">+91 98880 12345</small></td><td>Meta Ads</td><td>🇨🇦 Canada</td><td><span class="chip gold">Warm</span></td><td>Chirag</td><td>Call today</td></tr><tr><td><b>Priya Mehta</b><br><small style="color:var(--text-muted)">+91 97250 88776</small></td><td>Walk-in</td><td>🇬🇧 UK</td><td><span class="chip red">Hot</span></td><td>Chirag</td><td>Visa docs</td></tr><tr><td><b>Amit Patel</b><br><small style="color:var(--text-muted)">+91 99090 44123</small></td><td>Referral</td><td>🇦🇺 Australia</td><td><span class="chip green">Converted</span></td><td>Chirag</td><td>Admission</td></tr></tbody></table></div></div></div>
+<div class="page" id="page-coaching"><div class="page-header"><div class="page-header-left"><h1>🎓 Coaching Module</h1><p>IELTS, PTE & Language class management</p></div><div class="page-header-right"><button class="btn btn-ghost btn-sm">📤 Export CSV</button><button class="btn btn-ghost btn-sm">👥 User Count</button><button class="btn btn-primary">+ Add Student</button></div></div><div class="grid g-3" style="margin-bottom:18px"><div class="stat-card"><div class="stat-icon" style="background:var(--blue-pale);color:var(--blue-mid)">👨‍🎓</div><div class="stat-info"><div class="val">148</div><div class="lbl">Active Students</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--green-light);color:var(--green)">📚</div><div class="stat-info"><div class="val">6</div><div class="lbl">Active Batches</div></div></div><div class="stat-card"><div class="stat-icon" style="background:var(--gold-light);color:var(--gold)">🎯</div><div class="stat-info"><div class="val">7.2</div><div class="lbl">Avg Band Score</div></div></div></div><div class="card"><div class="card-header"><span class="card-title">📋 Students List</span></div><div class="card-body" style="padding:0"><table><thead><tr><th>Student Details</th><th>Branch</th><th>Products</th><th>Last Modified By</th><th>Last Updated</th><th>Status</th><th>Actions</th></tr></thead><tbody><tr><td><b>Vasudha</b><br><small>vasudha.kananinternational@gmail.com</small><br><small>91352752883</small><br><small style="color:var(--text-muted)">4/22/2026, 5:51 PM</small></td><td>Test Account 5 - HO</td><td>—</td><td>agent1</td><td>5/11/2026, 7:01 PM</td><td><span class="chip green">Approved</span></td><td><button style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted)">⋮</button></td></tr><tr><td><b>Patel Happy</b><br><small>kananhappy9+10@gmail.com</small><br><small>7870999231</small><br><small style="color:var(--text-muted)">2/10/2023, 5:43 PM</small></td><td>Test Account 5 - HO</td><td>—</td><td>agent1</td><td>5/9/2026, 6:42 PM</td><td><span class="chip green">Approved</span></td><td><button style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted)">⋮</button></td></tr><tr><td><b>Ram Patel</b><br><small>abc9090@gmail.com</small><br><small>2345678923</small><br><small style="color:var(--text-muted)">4/13/2026, 12:28 PM</small></td><td>Test Account 5 - HO</td><td>—</td><td>agent1</td><td>4/13/2026, 12:34 PM</td><td><span class="chip green">Approved</span></td><td><button style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted)">⋮</button></td></tr><tr><td><b>Sonia Chauhan</b><br><small>abcfhfh@gmail.com</small><br><small>7845123698</small><br><small style="color:var(--text-muted)">3/27/2026, 8:18 PM</small></td><td>Test Account 5 - HO</td><td>—</td><td>Agent 5</td><td>3/27/2026, 8:27 PM</td><td><span class="chip green">Approved</span></td><td><button style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted)">⋮</button></td></tr></tbody></table></div></div></div>
+<div class="page" id="page-leaderboard"><div class="page-header"><div class="page-header-left"><h1>🏆 Leaderboard</h1><p>Top performers at Kanan.co — May 2025</p></div></div><div class="grid g-2"><div class="card"><div class="card-header"><span class="card-title">🏆 Overall Rankings</span></div><div class="card-body"><div class="lb-item"><div class="lb-rank" style="color:#C8960A">🥇</div><div class="avatar" style="background:linear-gradient(135deg,#C8960A,#E8A020)">AS</div><div><div style="font-weight:600;font-size:13px">Ankit Shah</div><div style="font-size:11px;color:var(--text-muted)">Branch Head · Surat</div></div><div class="lb-pts" style="margin-left:auto">4,250</div></div><div class="lb-item"><div class="lb-rank" style="color:#8B9AB0">🥈</div><div class="avatar" style="background:linear-gradient(135deg,#6B8BB0,#8BA8CC)">RS</div><div><div style="font-weight:600;font-size:13px">Riya Sharma</div><div style="font-size:11px;color:var(--text-muted)">Sr. Counsellor · Surat</div></div><div class="lb-pts" style="margin-left:auto">3,680</div></div><div class="lb-item" style="background:var(--gold-light);border-radius:9px;padding:8px 9px;margin:-2px -3px"><div class="lb-rank" style="color:#A0602A">🥉</div><div class="avatar" style="background:linear-gradient(135deg,var(--gold),#F07B30)">CP</div><div><div style="font-weight:700;font-size:13px">Chirag Parmar <span style="color:var(--blue-mid);font-size:10.5px">(You)</span></div><div style="font-size:11px;color:var(--text-muted)">BDM · Surat</div></div><div class="lb-pts" style="margin-left:auto">2,840</div></div><div class="lb-item"><div class="lb-rank">4</div><div class="avatar" style="background:linear-gradient(135deg,#5B7FB0,#7B9FD0)">NP</div><div><div style="font-weight:600;font-size:13px">Nidhi Patel</div><div style="font-size:11px;color:var(--text-muted)">Counsellor · Surat</div></div><div class="lb-pts" style="margin-left:auto">2,410</div></div></div></div><div class="card"><div class="card-header"><span class="card-title">📈 Your Progress</span></div><div class="card-body"><div style="text-align:center;padding:10px 0 16px"><div style="font-family:'Sora',sans-serif;font-size:40px;font-weight:800;color:var(--gold)">2,840</div><div style="color:var(--text-muted);font-size:12.5px">K Points · Rank #3</div><div style="margin-top:7px;font-size:13px">Need <b style="color:var(--blue-mid)">840 more points</b> to reach #2</div></div><div class="progress-wrap"><div class="progress-label"><span>Progress to #2</span><span>77%</span></div><div class="progress-track"><div class="progress-fill" style="width:77%;background:var(--gold)"></div></div></div><div class="progress-wrap"><div class="progress-label"><span>Leads converted</span><span>21/30</span></div><div class="progress-track"><div class="progress-fill" style="width:70%;background:var(--blue-mid)"></div></div></div></div></div></div></div>
+<div class="page" id="page-kpoints"><div class="page-header"><div class="page-header-left"><h1>🪙 K Points — Reward System</h1><p>Earn and redeem recognition points</p></div></div><div class="kpoints-hero"><div><div class="kpoints-val">2,840</div><div style="font-size:12px;opacity:0.75;margin-top:4px">Your K Points Balance</div><div style="margin-top:12px;display:flex;gap:9px"><button class="btn" style="background:rgba(255,255,255,0.2);color:white">🎁 Redeem</button><button class="btn" style="background:rgba(255,255,255,0.2);color:white">📋 History</button></div></div><div style="text-align:right"><div style="font-size:12px;opacity:0.7">Rank</div><div style="font-family:'Sora',sans-serif;font-size:44px;font-weight:800">#3</div></div></div><div class="card"><div class="card-header"><span class="card-title">📜 Recent Point Activity</span></div><div class="card-body" style="padding:0"><table><thead><tr><th>Activity</th><th>Points</th><th>Date</th><th>Type</th></tr></thead><tbody><tr><td>Completed IELTS Training Module</td><td style="color:var(--green);font-weight:600">+150</td><td>May 11</td><td><span class="chip green">Training</span></td></tr><tr><td>Lead Converted – Rohan Desai</td><td style="color:var(--green);font-weight:600">+200</td><td>May 9</td><td><span class="chip blue">CRM</span></td></tr><tr><td>Perfect Attendance – Week 18</td><td style="color:var(--green);font-weight:600">+75</td><td>May 8</td><td><span class="chip gold">Attendance</span></td></tr><tr><td>Redeem: Amazon Voucher ₹500</td><td style="color:var(--red);font-weight:600">-500</td><td>May 1</td><td><span class="chip red">Redemption</span></td></tr></tbody></table></div></div></div>
+<div class="page" id="page-badges"><div class="page-header"><div class="page-header-left"><h1>🎖️ K Badge System</h1><p>Earn badges for performance milestones</p></div></div><div class="card" style="margin-bottom:14px"><div class="card-header"><span class="card-title">🏅 Your Earned Badges (4)</span></div><div class="card-body"><div class="badge-grid"><div class="badge-item earned"><div class="badge-icon">🌟</div><div class="badge-name">Star Performer</div><div class="badge-desc">Top 5 this month</div></div><div class="badge-item earned"><div class="badge-icon">🚀</div><div class="badge-name">Quick Starter</div><div class="badge-desc">30-day onboarding</div></div><div class="badge-item earned"><div class="badge-icon">🤝</div><div class="badge-name">Team Player</div><div class="badge-desc">Collaboration score</div></div><div class="badge-item earned"><div class="badge-icon">🎓</div><div class="badge-name">Knowledge Seeker</div><div class="badge-desc">4 trainings done</div></div></div></div></div><div class="card"><div class="card-header"><span class="card-title">🔒 Badges to Unlock</span></div><div class="card-body"><div class="badge-grid"><div class="badge-item locked"><div class="badge-icon">👑</div><div class="badge-name">Leader</div><div class="badge-desc">Reach Rank #1</div></div><div class="badge-item locked"><div class="badge-icon">💎</div><div class="badge-name">Diamond Agent</div><div class="badge-desc">50 conversions</div></div><div class="badge-item locked"><div class="badge-icon">🔥</div><div class="badge-name">Hot Streak</div><div class="badge-desc">30-day streak</div></div><div class="badge-item locked"><div class="badge-icon">🌍</div><div class="badge-name">Global Expert</div><div class="badge-desc">All destinations</div></div></div></div></div></div>
+<div class="page" id="page-culture"><div class="page-header"><div class="page-header-left"><h1>❤️ Culture & Engagement</h1><p>Team pulse, surveys and culture initiatives</p></div></div><div class="grid g-2"><div class="card"><div class="card-header"><span class="card-title">📊 Team Pulse — May 2025</span></div><div class="card-body"><div class="progress-wrap"><div class="progress-label"><span>Work-Life Balance</span><span>82%</span></div><div class="progress-track"><div class="progress-fill" style="width:82%;background:var(--green)"></div></div></div><div class="progress-wrap"><div class="progress-label"><span>Manager Effectiveness</span><span>88%</span></div><div class="progress-track"><div class="progress-fill" style="width:88%;background:var(--blue-mid)"></div></div></div><div class="progress-wrap"><div class="progress-label"><span>Career Growth</span><span>76%</span></div><div class="progress-track"><div class="progress-fill" style="width:76%;background:var(--gold)"></div></div></div><div class="progress-wrap"><div class="progress-label"><span>Team Collaboration</span><span>91%</span></div><div class="progress-track"><div class="progress-fill" style="width:91%;background:var(--purple)"></div></div></div></div></div><div class="card"><div class="card-header"><span class="card-title">🎉 Upcoming Activities</span></div><div class="card-body"><div style="display:flex;flex-direction:column;gap:11px"><div style="display:flex;gap:11px;align-items:center"><span style="font-size:22px">🏏</span><div><div style="font-weight:600">Kanan Cricket League</div><div style="font-size:11.5px;color:var(--text-muted)">May 25 · Register by May 20</div></div><button class="btn btn-outline btn-sm" style="margin-left:auto">Join</button></div><div style="display:flex;gap:11px;align-items:center"><span style="font-size:22px">🏆</span><div><div style="font-weight:600">Employee of the Month — May</div><div style="font-size:11.5px;color:var(--text-muted)">Voting ends May 28</div></div><button class="btn btn-primary btn-sm" style="margin-left:auto">Vote</button></div></div></div></div></div></div>
+<div class="page" id="page-assets"><div class="page-header"><div class="page-header-left"><h1>💼 Asset & Resources</h1><p>Company assets assigned to you</p></div></div><div class="card"><div class="card-body" style="padding:0"><table><thead><tr><th>Asset</th><th>Type</th><th>Serial No.</th><th>Assigned On</th><th>Status</th></tr></thead><tbody><tr><td>🖥️ Dell Laptop XPS 15</td><td>Hardware</td><td>DL-2025-0042</td><td>Apr 1, 2025</td><td><span class="chip green">Active</span></td></tr><tr><td>📱 Samsung Galaxy A54</td><td>Mobile</td><td>SM-G0042-25</td><td>Apr 1, 2025</td><td><span class="chip green">Active</span></td></tr></tbody></table></div></div></div>
+<div class="page" id="page-rooms"><div class="page-header"><div class="page-header-left"><h1>🏛️ Room & Auditorium Booking</h1><p>Reserve conference rooms and event spaces</p></div><div class="page-header-right"><button class="btn btn-primary">+ Book Room</button></div></div><div class="grid g-3"><div class="card"><div class="card-body" style="text-align:center;padding:22px"><div style="font-size:34px;margin-bottom:9px">🏢</div><div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px">Conference Room A</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Capacity: 10 · Ground Floor</div><span class="chip green" style="margin-bottom:12px;display:inline-block">Available Now</span><br><button class="btn btn-primary btn-sm">Book Now</button></div></div><div class="card"><div class="card-body" style="text-align:center;padding:22px"><div style="font-size:34px;margin-bottom:9px">🏛️</div><div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px">Main Auditorium</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Capacity: 150 · 2nd Floor</div><span class="chip red" style="margin-bottom:12px;display:inline-block">Booked until 4 PM</span><br><button class="btn btn-outline btn-sm">Schedule Later</button></div></div><div class="card"><div class="card-body" style="text-align:center;padding:22px"><div style="font-size:34px;margin-bottom:9px">💻</div><div style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px">Training Room</div><div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Capacity: 30 · 1st Floor</div><span class="chip green" style="margin-bottom:12px;display:inline-block">Available Now</span><br><button class="btn btn-primary btn-sm">Book Now</button></div></div></div></div>
+<div class="page" id="page-requests"><div class="page-header"><div class="page-header-left"><h1>📤 Request / Submit Asset</h1><p>Request new assets or return existing ones</p></div></div><div class="card" style="max-width:560px"><div class="card-header"><span class="card-title">📝 New Asset Request</span></div><div class="card-body"><div class="form-group"><label class="form-label">Request Type</label><select class="form-input"><option>New Asset Request</option><option>Asset Return</option><option>Asset Repair</option></select></div><div class="form-group"><label class="form-label">Asset Category</label><select class="form-input"><option>Laptop / Computer</option><option>Mobile Device</option><option>Peripheral</option><option>Furniture</option></select></div><div class="form-group"><label class="form-label">Justification</label><textarea class="form-input" rows="3" placeholder="Describe your requirement…"></textarea></div><button class="btn btn-primary">Submit Request</button></div></div></div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+  // ── NAVIGATION ──
+  const PAGE_HUB = {
+    ess:'mykanan', payroll:'mykanan', leave:'mykanan', profile:'mykanan', employees:'mykanan', policies:'mykanan', schedule:'mykanan',
+    news:'workhub', crm:'workhub', coaching:'workhub', kapply:'workhub', vas:'workhub', events:'workhub', kb:'workhub', tasks:'workhub', mom:'workhub', reports:'workhub',
+    training:'growthhub', culture:'growthhub', leaderboard:'growthhub', kpoints:'growthhub', badges:'growthhub',
+    helpdesk:'helpdesk', assets:'helpdesk', rooms:'helpdesk', requests:'helpdesk'
+  };
+
+  function navigate(el, pageId) {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    const navEl = el && el.classList && el.classList.contains('nav-item') ? el : document.querySelector(`[data-page="${pageId}"]`);
+    if (navEl) navEl.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const pg = document.getElementById('page-' + pageId);
+    if (pg) pg.classList.add('active');
+    document.getElementById('sidebar').classList.toggle('hidden-page', pageId === 'console');
+    document.getElementById('header').classList.toggle('console-mode', pageId === 'console');
+    const hub = PAGE_HUB[pageId];
+    document.querySelectorAll('.hub-group').forEach(g => g.classList.toggle('hub-hidden', !!hub && g.dataset.hub !== hub));
+    closeNotif();
+  }
+
+  // ── SIDEBAR ──
+  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+
+  // ── NOTIFICATIONS ──
+  function toggleNotif() { document.getElementById('notifPanel').classList.toggle('show'); }
+  function closeNotif() { document.getElementById('notifPanel').classList.remove('show'); }
+  document.addEventListener('click', e => { if (!e.target.closest('#notifPanel') && !e.target.closest('#notifBtn')) closeNotif(); });
+
+  // ── TASK TOGGLE ──
+  function toggleTask(el) {
+    el.classList.toggle('done');
+    const text = el.nextElementSibling;
+    if (text) text.classList.toggle('done');
+    el.textContent = el.classList.contains('done') ? '✓' : '';
+  }
+
+  // ── K APPLY TABS ──
+  function switchKApplyTab(btn, tabId) {
+    document.querySelectorAll('#page-kapply .page-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    ['students','commission','company','escalation','kapply-reports'].forEach(id => {
+      const el = document.getElementById('kapply-' + id);
+      if (el) el.style.display = id === tabId ? 'block' : 'none';
+    });
+  }
+
+  // ── EVENT TABS ──
+  function switchEvtTab(btn, tabId) {
+    btn.closest('.tab-strip').querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('events-upcoming').style.display = tabId === 'upcoming' ? 'block' : 'none';
+    document.getElementById('events-past').style.display = tabId === 'past' ? 'block' : 'none';
+  }
+
+  // ── TASK VIEW TABS ──
+  function switchTaskView(tab, viewId) {
+    document.querySelectorAll('.task-view-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    ['groups','my-tasks','reports','calendar'].forEach(id => {
+      const el = document.getElementById('task-' + id);
+      if (el) el.style.display = id === viewId ? 'block' : 'none';
+    });
+  }
+
+  // ── CP TABS ──
+  document.querySelectorAll('.cp-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      this.closest('.cp-tab-bar').querySelectorAll('.cp-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // ── GENERIC TAB STRIPS ──
+  document.querySelectorAll('.tab-strip').forEach(strip => {
+    strip.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        strip.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  });
+
+  // ── MINI CALENDAR ──
+  function buildCalendar() {
+    const today = new Date(2025, 4, 13);
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const hasEvents = [5, 8, 13, 16, 20, 25];
+    const year = today.getFullYear(), month = today.getMonth();
+    let html = `<div class="cal-nav"><button class="cal-nav-btn">‹</button><span class="cal-month">${months[month]} ${year}</span><button class="cal-nav-btn">›</button></div><div class="cal-grid">`;
+    days.forEach(d => html += `<div class="cal-day-hd">${d}</div>`);
+    const first = new Date(year, month, 1).getDay();
+    const last = new Date(year, month + 1, 0).getDate();
+    for (let i = 0; i < first; i++) html += `<div class="cal-day other-month"></div>`;
+    for (let d = 1; d <= last; d++) {
+      let cls = 'cal-day';
+      if (d === 13) cls += ' today';
+      else if (hasEvents.includes(d)) cls += ' has-event';
+      html += `<div class="${cls}">${d}</div>`;
+    }
+    html += '</div>';
+    document.getElementById('miniCal').innerHTML = html;
+  }
+  buildCalendar();
+
+  // ── GLOBAL SEARCH ──
+  const searchMap = {
+    'leave':['leave','vacation','time off'],'payroll':['payroll','salary','payslip'],
+    'crm':['crm','leads','lead','sales'],'tasks':['tasks','task','todo'],
+    'kapply':['kapply','k apply','admission','visa','student','partner'],
+    'leaderboard':['leaderboard','rank','ranking'],'kpoints':['kpoints','k points','reward'],
+    'training':['training','course','learn','ielts','pte'],'helpdesk':['help','support','ticket'],
+    'coaching':['coaching','batch','ielts','pte'],'reports':['reports','performance','analytics'],
+    'profile':['profile','account'],'schedule':['attendance','schedule'],
+    'news':['news','announcement'],'events':['event','webinar','fair'],
+    'kb':['knowledge','knowledgebase','folder','document','sop'],
+    'mom':['mom','meeting','minutes'],'vas':['vas','service','forex','insurance'],
+  };
+  document.getElementById('globalSearch').addEventListener('input', function() {
+    const q = this.value.toLowerCase().trim();
+    if (!q || q.length < 2) return;
+    for (const [page, keys] of Object.entries(searchMap)) {
+      if (keys.some(k => k.includes(q) || q.includes(k))) {
+        navigate(null, page); this.value = ''; break;
+      }
+    }
+  });
+</script>
+</body>
+</html>
